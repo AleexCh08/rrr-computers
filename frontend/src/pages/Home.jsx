@@ -86,6 +86,13 @@ export default function Home() {
 
       <PartsSection />
       <CollaborateSection />
+      <section style={{ backgroundColor: '#fff', textAlign: 'center', padding: '60px 20px' }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'center' }}>
+          <h3 style={{ fontSize: '1.4rem', fontWeight: '500', maxWidth: '800px', lineHeight: '1.5', color: 'var(--text-dark)' }}>
+            Estamos interesados en proveer equipos a quien lo necesite, esto incluye a personas, institutos, universidades y organizaciones
+          </h3>
+        </div>
+      </section>
       <Footer />
       
     </div>
