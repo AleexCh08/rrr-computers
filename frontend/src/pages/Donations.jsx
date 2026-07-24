@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import DonationForm from '../components/donations/DonationForm';
@@ -29,6 +30,10 @@ export default function Donations() {
             border: '1px solid #eaeaea'
           }}
         >
+          <div style={{ fontSize: '0.9rem', marginBottom: '30px', color: '#666', fontWeight: '600' }}>
+            <Link to="/" style={{ color: '#333' }}>Home</Link> <span style={{ margin: '0 8px', color: '#ccc' }}>&gt;</span> Donar
+          </div>
+          
           {/* Cabecera del formulario */}
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h1 style={{ fontSize: '2.5rem', marginBottom: '15px' }}>Formulario De Donación</h1>
