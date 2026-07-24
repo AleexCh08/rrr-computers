@@ -1,20 +1,23 @@
+import { Link } from 'react-router-dom';
 import { FiSearch, FiUser, FiShoppingCart } from 'react-icons/fi';
-import './Navbar.css'; // Crea un archivo css en la misma carpeta para estilos específicos
+import './Navbar.css';
 
 export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="container nav-content">
         <div className="logo">
-          <h2>RRR<span>COMPUTERS</span></h2>
+          <Link to="/">
+            <h2>RRR<span>COMPUTERS</span></h2>
+          </Link>
         </div>
         <ul className="nav-links">
-          <li><a href="#">Componentes</a></li>
-          <li><a href="#">Ensamblar</a></li>
-          <li><a href="#">Asesoría</a></li>
-          <li><a href="#">Donar</a></li>
-          <li><a href="#">Devolución</a></li>
-          <li><a href="#">Nosotros</a></li>
+          <li><Link to="/">Componentes</Link></li>
+          <li><Link to="/">Ensamblar</Link></li>
+          <li><Link to="/">Asesoría</Link></li>
+          <li><Link to="/donar">Donar</Link></li>
+          <li><Link to="/">Devolución</Link></li>
+          <li><Link to="/">Nosotros</Link></li>
         </ul>
         <div className="nav-actions">
           <div className="search-bar">
