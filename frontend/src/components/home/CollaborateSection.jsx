@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { FaHandshakeAngle } from 'react-icons/fa6';
+import { Link } from 'react-router-dom';
 
 export default function CollaborateSection() {
   return (
@@ -15,7 +16,9 @@ export default function CollaborateSection() {
         <div style={{ flex: 1,  alignItems: 'center', textAlign: 'center' }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>Colabora</h2>
           <p style={{ marginBottom: '20px', fontSize: '1.1rem', color: '#ccc' }}>Si quieres trabajar con nosotros, contáctanos</p>
-          <button className="btn-primary">Ver más</button>
+          <Link to="/donar">
+            <button className="btn-primary">Ver más</button>
+          </Link>        
         </div>
         
         <div style={{ flex: 2, borderLeft: '2px solid rgba(255,255,255,0.1)', paddingLeft: '40px', textAlign: 'center' }}>

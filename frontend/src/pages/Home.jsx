@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { MdRecycling } from 'react-icons/md';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
@@ -50,7 +51,9 @@ export default function Home() {
           <div style={{ width: '25%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
             <h2 style={{ fontSize: '2.5rem' }}>Catálogo</h2>
             <p style={{ margin: '20px 0', color: '#555', fontSize: '1.1rem' }}>Encuentra computadoras prediseñadas</p>
-            <button className="btn-primary">Ver más</button>
+            <Link to="/catalogo">
+              <button className="btn-primary">Ver más</button>
+            </Link>        
           </div>
           <div style={{ width: '75%' }}>
              <ProductCarousel>

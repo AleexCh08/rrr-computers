@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import ProductCard from '../ui/ProductCard';
 import ProductCarousel from '../ui/ProductCarousel';
+import { Link } from 'react-router-dom';
 
 import imgFuente from '../../assets/fuente.png';
 import imgTeclado from '../../assets/teclado.png';
@@ -43,7 +44,9 @@ export default function PartsSection() {
         </div>
         
         <div style={{ textAlign: 'center' }}>
-          <button className="btn-primary">Ver más</button>
+          <Link to="/catalogo">
+            <button className="btn-primary">Ver más</button>
+          </Link>          
         </div>
       </div>
     </motion.section>
