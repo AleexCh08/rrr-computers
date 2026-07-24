@@ -133,7 +133,14 @@ export default function DonationForm() {
       </form>
 
       {/* MODAL */}
-      <Modal isOpen={showModal} onClose={handleCloseModal} />
+      <Modal isOpen={showModal} onClose={handleCloseModal} title="¡Gracias por tu generosidad!">
+        <p style={{ fontSize: '1.1rem', marginBottom: '15px', fontWeight: '600', color: '#333' }}>
+          Tu donación ha sido registrada con éxito.<br />Te agradecemos mucho por apoyar nuestra causa.
+        </p>
+        <p style={{ fontSize: '1.1rem', marginBottom: '40px', fontWeight: '600', color: '#333' }}>
+          Si deseas, puedes cerrar esta ventana o realizar<br />otra donación.
+        </p>
+      </Modal>
     </>
   );
 }

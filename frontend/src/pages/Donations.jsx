@@ -12,6 +12,8 @@ export default function Donations() {
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '400px', backgroundColor: 'var(--primary-dark)', zIndex: -1 }}></div>
       
       <main style={{ flexGrow: 1, padding: '60px 20px', display: 'flex', justifyContent: 'center' }}>
+
+        
         
         <motion.div 
           initial={{ opacity: 0, y: 30 }}

@@ -14,7 +14,7 @@ export default function Navbar() {
         <ul className="nav-links">
           <li><Link to="/">Componentes</Link></li>
           <li><Link to="/">Ensamblar</Link></li>
-          <li><Link to="/">Asesoría</Link></li>
+          <li><Link to="/asesoria">Asesoría</Link></li>
           <li><Link to="/donar">Donar</Link></li>
           <li><Link to="/">Devolución</Link></li>
           <li><Link to="/">Nosotros</Link></li>

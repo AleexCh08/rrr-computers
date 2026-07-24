@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function Modal({ isOpen, onClose }) {
+export default function Modal({ isOpen, onClose, title, children }) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -42,18 +42,10 @@ export default function Modal({ isOpen, onClose }) {
             }}
           >
             <h2 style={{ fontSize: '2rem', marginBottom: '25px', color: 'var(--text-dark)' }}>
-              ¡Gracias por tu generosidad!
+              {title}
             </h2>
-            <p style={{ fontSize: '1.1rem', marginBottom: '15px', fontWeight: '600', color: '#333' }}>
-              Tu donación ha sido registrada con éxito.
-              <br />
-              Te agradecemos mucho por apoyar nuestra causa.
-            </p>
-            <p style={{ fontSize: '1.1rem', marginBottom: '40px', fontWeight: '600', color: '#333' }}>
-              Si deseas, puedes cerrar esta ventana o realizar
-              <br />
-              otra donación.
-            </p>
+            
+            {children}
             <button 
               onClick={onClose}
               className="btn-primary"
