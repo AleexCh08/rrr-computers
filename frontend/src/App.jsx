@@ -4,6 +4,7 @@ import Donations from './pages/Donations.jsx';
 import Contact from './pages/Contact.jsx';
 import Catalog from './pages/Catalog.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
+import About from './pages/About.jsx';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/asesoria" element={<Contact />} />
         <Route path="/catalogo" element={<Catalog />} />
         <Route path="/producto/:id" element={<ProductDetail />} />
+        <Route path="/nosotros" element={<About />} />
       </Routes>
     </Router>
   );

@@ -17,7 +17,7 @@ export default function Navbar() {
           <li><Link to="/asesoria">Asesoría</Link></li>
           <li><Link to="/donar">Donar</Link></li>
           <li><Link to="/">Devolución</Link></li>
-          <li><Link to="/">Nosotros</Link></li>
+          <li><Link to="/nosotros">Nosotros</Link></li>
         </ul>
         <div className="nav-actions">
           <div className="search-bar">
