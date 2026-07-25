@@ -1,8 +1,18 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FiEdit, FiTrash2, FiPlus, FiSearch } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 
 export default function Inventory() {
+    const [alertMessage, setAlertMessage] = useState(null);
+
+  // 2. Función para mostrar la alerta y ocultarla automáticamente tras 3 segundos
+  const triggerAlert = (message) => {
+    setAlertMessage(message);
+    setTimeout(() => {
+      setAlertMessage(null);
+    }, 3000);
+  };
   // Datos simulados basados en tu mockup
   const [inventory, setInventory] = useState([
     { id: 1, name: 'Intel i3-8800', price: 50, type: 'CPU', stock: 5 },
@@ -38,15 +48,31 @@ export default function Inventory() {
               <button className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 Buscar
               </button>
-              <button className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FiPlus /> Añadir
-              </button>
+              <Link to="/admin/inventario/nuevo" style={{ textDecoration: 'none' }}>
+                <button className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <FiPlus /> Añadir
+                </button>
+              </Link>
             </div>
           </div>
 
-          {/* Tabla de Datos */}
+          {alertMessage && (
+            <div style={{ 
+              backgroundColor: '#ebebeb', 
+              borderLeft: '5px solid #4CAF50', 
+              padding: '12px 20px', 
+              marginBottom: '25px', 
+              color: '#111', 
+              fontWeight: '600',
+              fontSize: '1.05rem',
+              display: 'inline-block',
+              minWidth: '350px'
+            }}>
+              {alertMessage}
+            </div>
+          )}
+
           <div style={{ border: '1px solid #eaeaea', borderRadius: '8px', overflow: 'hidden' }}>
-            {/* Encabezado */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 100px 100px', backgroundColor: '#4CAF50', color: 'white', fontWeight: '600', padding: '15px', textAlign: 'center' }}>
               <div style={{ textAlign: 'left', paddingLeft: '10px' }}>Nombre</div>
               <div>Precio</div>
@@ -56,7 +82,6 @@ export default function Inventory() {
               <div>Borrar</div>
             </div>
 
-            {/* Filas */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {inventory.map((item, index) => (
                 <div 
@@ -84,17 +109,22 @@ export default function Inventory() {
                     </span>
                   </div>
                   <div>
-                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#333' }}><FiEdit size={18} /></button>
+                    <Link to={`/admin/inventario/editar/${item.id}`}>
+                      <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#333' }}>
+                        <FiEdit size={18} />
+                      </button>
+                    </Link>
                   </div>
                   <div>
-                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}><FiTrash2 size={18} /></button>
+                    <button onClick={() => triggerAlert('Componente eliminado con éxito')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
+                      <FiTrash2 size={18} />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Paginación */}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
             <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
               <button style={{ padding: '8px 16px', background: '#f5f5f5', border: 'none', borderRight: '1px solid #ddd', color: '#555', cursor: 'pointer', fontWeight: '600' }}>Anterior</button>

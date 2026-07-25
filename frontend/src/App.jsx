@@ -11,8 +11,11 @@ import Assemble from './pages/Assemble.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import RecoverPassword from './pages/RecoverPassword.jsx';
+
 import AdminLogin from './pages/admin/AdminLogin.jsx';
 import Inventory from './pages/admin/Inventory.jsx';
+import AddComponent from './pages/admin/AddComponent.jsx';
+import EditComponent from './pages/admin/EditComponent.jsx';
 
 function App() {
   return (
@@ -33,6 +36,8 @@ function App() {
 
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/inventario" element={<Inventory />} />
+        <Route path="/admin/inventario/nuevo" element={<AddComponent />} />
+        <Route path="/admin/inventario/editar/:id" element={<EditComponent />} />
       </Routes>
     </Router>
   );
