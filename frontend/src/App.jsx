@@ -16,6 +16,7 @@ import AdminLogin from './pages/admin/AdminLogin.jsx';
 import Inventory from './pages/admin/Inventory.jsx';
 import AddComponent from './pages/admin/AddComponent.jsx';
 import EditComponent from './pages/admin/EditComponent.jsx';
+import AdminDonations from './pages/admin/AdminDonations.jsx';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/admin/inventario" element={<Inventory />} />
         <Route path="/admin/inventario/nuevo" element={<AddComponent />} />
         <Route path="/admin/inventario/editar/:id" element={<EditComponent />} />
+        <Route path="/admin/donaciones" element={<AdminDonations />} />
       </Routes>
     </Router>
   );
