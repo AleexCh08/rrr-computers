@@ -11,6 +11,7 @@ import Assemble from './pages/Assemble.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import RecoverPassword from './pages/RecoverPassword.jsx';
+import AdminLogin from './pages/admin/AdminLogin.jsx';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Register />} />
         <Route path="/recuperar" element={<RecoverPassword />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
       </Routes>
     </Router>
   );
