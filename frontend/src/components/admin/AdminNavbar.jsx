@@ -35,6 +35,8 @@ export default function AdminNavbar() {
           <li><Link to="/admin/inventario" style={getLinkStyle('/admin/inventario')}>Inventario</Link></li>
           <li><Link to="/admin/donaciones" style={getLinkStyle('/admin/donaciones')}>Donaciones</Link></li>
           <li><Link to="/admin/ordenes" style={getLinkStyle('/admin/ordenes')}>Órdenes</Link></li>
+          <li><Link to="/admin/devoluciones" style={getLinkStyle('/admin/devoluciones')}>Devoluciones</Link></li>
+          <li><Link to="/admin/usuarios" style={getLinkStyle('/admin/usuarios')}>Usuarios</Link></li>
         </ul>
       </div>
 

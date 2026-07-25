@@ -19,6 +19,8 @@ import EditComponent from './pages/admin/EditComponent.jsx';
 import AdminDonations from './pages/admin/AdminDonations.jsx';
 import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import AdminReturns from './pages/admin/AdminReturns.jsx';
+import AdminUsers from './pages/admin/AdminUsers.jsx';
 
 function App() {
   return (
@@ -44,6 +46,8 @@ function App() {
         <Route path="/admin/inventario/editar/:id" element={<EditComponent />} />
         <Route path="/admin/donaciones" element={<AdminDonations />} />
         <Route path="/admin/ordenes" element={<AdminOrders />} />
+        <Route path="/admin/devoluciones" element={<AdminReturns />} />
+        <Route path="/admin/usuarios" element={<AdminUsers />} />
       </Routes>
     </Router>
   );
