@@ -129,12 +129,14 @@ export default function Cart() {
               <span>${total}</span>
             </div>
 
-            <button 
-              className="btn-primary" 
-              style={{ width: '100%', padding: '15px', fontSize: '1.1rem', marginBottom: '15px', opacity: cartItems.length === 0 ? 0.5 : 1, pointerEvents: cartItems.length === 0 ? 'none' : 'auto' }}
-            >
-              Proceder al pago
-            </button>
+            <Link to="/checkout" style={{ textDecoration: 'none' }}>
+              <button 
+                className="btn-primary" 
+                style={{ width: '100%', padding: '15px', fontSize: '1.1rem', marginBottom: '15px', opacity: cartItems.length === 0 ? 0.5 : 1, pointerEvents: cartItems.length === 0 ? 'none' : 'auto' }}
+              >
+                Proceder al pago
+              </button>
+            </Link>
             
             <Link to="/catalogo">
               <button style={{ width: '100%', padding: '15px', fontSize: '1.05rem', backgroundColor: 'transparent', color: '#5A7D9A', border: '1px solid #5A7D9A', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}>
