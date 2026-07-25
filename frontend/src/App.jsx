@@ -7,6 +7,7 @@ import ProductDetail from './pages/ProductDetail.jsx';
 import About from './pages/About.jsx';
 import Returns from './pages/Returns.jsx';
 import Cart from './pages/Cart.jsx';
+import Assemble from './pages/Assemble.jsx';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/nosotros" element={<About />} />
         <Route path="/devolucion" element={<Returns />} />
         <Route path="/carrito" element={<Cart />} />
+        <Route path="/ensamblar" element={<Assemble />} />
       </Routes>
     </Router>
   );

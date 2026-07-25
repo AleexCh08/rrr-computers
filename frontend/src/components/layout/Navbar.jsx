@@ -13,7 +13,7 @@ export default function Navbar() {
         </div>
         <ul className="nav-links">
           <li><Link to="/catalogo">Componentes</Link></li>
-          <li><Link to="/">Ensamblar</Link></li>
+          <li><Link to="/ensamblar">Ensamblar</Link></li>
           <li><Link to="/asesoria">Asesoría</Link></li>
           <li><Link to="/donar">Donar</Link></li>
           <li><Link to="/devolucion">Devolución</Link></li>
