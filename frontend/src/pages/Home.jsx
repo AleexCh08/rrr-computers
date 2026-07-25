@@ -83,7 +83,9 @@ export default function Home() {
           </div>
           <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
             <button className="btn-primary" style={{ padding: '15px 30px', fontSize: '1.1rem' }}>Ensambla tu Computadora</button>
-            <button className="btn-primary" style={{ padding: '15px 30px', fontSize: '1.1rem', backgroundColor: '#4CAF50' }}>Sobre Nosotros</button>
+            <Link to="/nosotros">
+              <button className="btn-primary" style={{ padding: '15px 30px', fontSize: '1.1rem', backgroundColor: '#4CAF50' }}>Sobre Nosotros</button>
+            </Link>
           </div>
         </div>
       </section>
