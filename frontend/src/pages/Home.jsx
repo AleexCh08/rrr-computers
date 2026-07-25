@@ -29,19 +29,31 @@ export default function Home() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         style={{ padding: '60px 20px', textAlign: 'center', position: 'relative', zIndex: 10 }}
       >
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '65%', backgroundColor: 'var(--primary-dark)', zIndex: -1 }}></div>
-        
-        <div className="container" style={{ background: 'white', padding: '50px', borderRadius: '15px', boxShadow: '0 12px 35px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '60px', border: '1px solid #d1d1d1' }}>
-            <h1 style={{ fontSize: '2.5rem', maxWidth: '650px', textAlign: 'center', lineHeight: '1.3' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '65%', backgroundColor: 'var(--primary-dark)', zIndex: -1 }}></div>        
+        <div className="container" style={{ background: 'white', padding: '40px 50px', borderRadius: '15px', boxShadow: '0 12px 35px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '50px', border: '1px solid #d1d1d1' }}>
+            
+            <motion.div
+              whileHover={{ scale: 1.05, rotate: 2 }} 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center' }}
+            >
+              <img src="/favicon.png" alt="RRR Computers Logo" style={{ width: '150px', objectFit: 'contain', filter: 'drop-shadow(0px 8px 15px rgba(0,0,0,0.1))' }} />
+            </motion.div>
+
+            <h1 style={{ fontSize: '2.2rem', maxWidth: '550px', textAlign: 'center', lineHeight: '1.3', flex: '1 1 auto', margin: 0, color: 'var(--text-dark)' }}>
               Nuestro objetivo es Reparar, Reusar y Reciclar material electrónico, encontrándoles una segunda vida y utilidad
             </h1>
+            
             <motion.div 
-              whileHover={{ scale: 1.1 }} 
+              whileHover={{ scale: 1.1, rotate: 2 }} 
               transition={{ duration: 0.3 }}
-              style={{ fontSize: '140px', color: 'var(--accent-green)', cursor: 'pointer', display: 'flex' }}
+              style={{ fontSize: '130px', color: 'var(--accent-green)', display: 'flex', flex: '0 0 auto' }}
             >
               <MdRecycling />
             </motion.div>
+            
         </div>
       </motion.section>
 
