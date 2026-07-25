@@ -24,7 +24,9 @@ export default function Navbar() {
             <FiSearch color="#888" />
             <input type="text" placeholder="Search" />
           </div>
-          <FiUser className="icon" />
+          <Link to="/login" style={{ color: 'inherit' }}>
+            <FiUser size={24} style={{ cursor: 'pointer' }} />
+          </Link>
           <Link to="/carrito" style={{ color: 'inherit' }}>
             <FiShoppingCart size={24} style={{ cursor: 'pointer' }} />
           </Link>

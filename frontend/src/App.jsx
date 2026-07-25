@@ -8,6 +8,9 @@ import About from './pages/About.jsx';
 import Returns from './pages/Returns.jsx';
 import Cart from './pages/Cart.jsx';
 import Assemble from './pages/Assemble.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
+import RecoverPassword from './pages/RecoverPassword.jsx';
 
 function App() {
   return (
@@ -22,6 +25,9 @@ function App() {
         <Route path="/devolucion" element={<Returns />} />
         <Route path="/carrito" element={<Cart />} />
         <Route path="/ensamblar" element={<Assemble />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Register />} />
+        <Route path="/recuperar" element={<RecoverPassword />} />
       </Routes>
     </Router>
   );
