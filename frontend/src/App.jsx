@@ -11,6 +11,7 @@ import Assemble from './pages/Assemble.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import RecoverPassword from './pages/RecoverPassword.jsx';
+import MyAccount from './pages/MyAccount.jsx';
 
 import AdminLogin from './pages/admin/AdminLogin.jsx';
 import Inventory from './pages/admin/Inventory.jsx';
@@ -38,6 +39,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Register />} />
         <Route path="/recuperar" element={<RecoverPassword />} />
+        <Route path="/mi-cuenta" element={<MyAccount />} />
 
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
