@@ -1,9 +1,13 @@
 import { motion } from 'framer-motion';
 import { FiShoppingCart } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
-export default function ProductCard({ image, price, title, description }) {
+export default function ProductCard({ id, image, price, title, description }) {
+  const navigate = useNavigate();
+
   return (
     <motion.div 
+      onClick={() => navigate(`/producto/${id || 1}`)}
       whileHover={{ y: -5, boxShadow: '0 8px 25px rgba(0,0,0,0.08)' }}
       transition={{ duration: 0.3 }}
       className="product-card" 
@@ -56,6 +60,7 @@ export default function ProductCard({ image, price, title, description }) {
           <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-dark)', margin: 0 }}>${price}</h3>
           
           <motion.button 
+            onClick={(e) => e.stopPropagation()}
             whileHover={{ scale: 1.02, backgroundColor: 'var(--accent-green-hover)' }}
             whileTap={{ scale: 0.95 }}
             style={{ 

@@ -7,10 +7,10 @@ import imgFuente from '../../assets/fuente.png';
 import imgTeclado from '../../assets/teclado.png';
 
 const partsData = [
-  { image: imgFuente, price: "5", title: "Fuente", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { image: imgTeclado, price: "15", title: "Teclado", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { image: imgFuente, price: "80", title: "Fuente", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { image: imgTeclado, price: "10", title: "Teclado", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." }
+  { id: 1,image: imgFuente, price: "5", title: "Fuente", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
+  { id: 2, image: imgTeclado, price: "15", title: "Teclado", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
+  { id: 3, image: imgFuente, price: "80", title: "Fuente", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
+  { id: 4, image: imgTeclado, price: "10", title: "Teclado", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." }
 ];
 
 export default function PartsSection() {
@@ -33,7 +33,8 @@ export default function PartsSection() {
           <ProductCarousel>
             {partsData.map((part) => (
               <ProductCard 
-                key={part.id} 
+                key={part.id}
+                id={part.id} 
                 image={part.image} 
                 price={part.price}
                 title={part.title} 

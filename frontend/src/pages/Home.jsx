@@ -11,10 +11,10 @@ import ProductCarousel from '../components/ui/ProductCarousel';
 import imgPc from '../assets/foto-pc.png';
 
 const catalogData = [
-  { image: imgPc, price: "89", title: "Computadora 1", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { image: imgPc, price: "89", title: "Computadora 2", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { image: imgPc, price: "89", title: "Computadora 3", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { image: imgPc, price: "89", title: "Computadora 4", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." }
+  { id: 1, image: imgPc, price: "89", title: "Computadora 1", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
+  { id: 2, image: imgPc, price: "89", title: "Computadora 2", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
+  { id: 3, image: imgPc, price: "89", title: "Computadora 3", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
+  { id: 4, image: imgPc, price: "89", title: "Computadora 4", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." }
 ];
 
 export default function Home() {
@@ -59,7 +59,8 @@ export default function Home() {
              <ProductCarousel>
                {catalogData.map((product) => (
                  <ProductCard 
-                   key={product.id} 
+                   key={product.id}
+                   id={product.id} 
                    image={product.image} 
                    price={product.price} 
                    title={product.title} 
