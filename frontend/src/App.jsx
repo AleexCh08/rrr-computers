@@ -17,6 +17,8 @@ import Inventory from './pages/admin/Inventory.jsx';
 import AddComponent from './pages/admin/AddComponent.jsx';
 import EditComponent from './pages/admin/EditComponent.jsx';
 import AdminDonations from './pages/admin/AdminDonations.jsx';
+import AdminOrders from './pages/admin/AdminOrders.jsx';
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 function App() {
   return (
@@ -36,10 +38,12 @@ function App() {
         <Route path="/recuperar" element={<RecoverPassword />} />
 
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/inventario" element={<Inventory />} />
         <Route path="/admin/inventario/nuevo" element={<AddComponent />} />
         <Route path="/admin/inventario/editar/:id" element={<EditComponent />} />
         <Route path="/admin/donaciones" element={<AdminDonations />} />
+        <Route path="/admin/ordenes" element={<AdminOrders />} />
       </Routes>
     </Router>
   );
