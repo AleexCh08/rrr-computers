@@ -12,6 +12,7 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import RecoverPassword from './pages/RecoverPassword.jsx';
 import AdminLogin from './pages/admin/AdminLogin.jsx';
+import Inventory from './pages/admin/Inventory.jsx';
 
 function App() {
   return (
@@ -29,7 +30,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Register />} />
         <Route path="/recuperar" element={<RecoverPassword />} />
+
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/inventario" element={<Inventory />} />
       </Routes>
     </Router>
   );
