@@ -87,10 +87,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # Configuración de CORS
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
+#CORS_ALLOWED_ORIGINS = [
+#    "http://localhost:5173",
+#    "http://127.0.0.1:5173",
+#]
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Configuración de Django REST Framework y JWT
 REST_FRAMEWORK = {
