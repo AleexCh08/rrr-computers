@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 
 export default function ComponentForm({ initialData = null, isEdit = false }) {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ export default function ComponentForm({ initialData = null, isEdit = false }) {
     description: ''
   });
 
-  // Si hay datos iniciales (modo edición), llenamos el formulario
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
@@ -23,13 +23,21 @@ export default function ComponentForm({ initialData = null, isEdit = false }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { 
     e.preventDefault();
-    // Aquí iría la conexión al backend (POST para añadir, PUT para editar)
-    console.log(isEdit ? 'Actualizando:' : 'Creando:', formData);
     
-    // Simulamos que guardó y regresamos al inventario
-    navigate('/admin/inventario');
+    try {
+      if (isEdit) {
+        await api.put(`inventario/componentes/${initialData.id}/`, formData);
+      } else {
+        await api.post('inventario/componentes/', formData);
+      }
+      
+      navigate('/admin/inventario');
+    } catch (error) {
+      console.error("Error al guardar el componente:", error);
+      alert('Hubo un error al guardar los datos en el servidor.');
+    }
   };
 
   return (

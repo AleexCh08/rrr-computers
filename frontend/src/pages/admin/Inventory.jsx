@@ -1,29 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiEdit, FiTrash2, FiPlus, FiSearch } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
+import api from '../../services/api';
 
 export default function Inventory() {
-    const [alertMessage, setAlertMessage] = useState(null);
+  const [alertMessage, setAlertMessage] = useState(null);
 
-  // 2. Función para mostrar la alerta y ocultarla automáticamente tras 3 segundos
   const triggerAlert = (message) => {
     setAlertMessage(message);
     setTimeout(() => {
       setAlertMessage(null);
     }, 3000);
   };
-  // Datos simulados basados en tu mockup
-  const [inventory, setInventory] = useState([
-    { id: 1, name: 'Intel i3-8800', price: 50, type: 'CPU', stock: 5 },
-    { id: 2, name: 'Intel i5-8800', price: 50, type: 'CPU', stock: 6 },
-    { id: 3, name: 'Intel i9-8800', price: 50, type: 'CPU', stock: 7 },
-    { id: 4, name: 'Ddr3 - 8GB', price: 50, type: 'RAM', stock: 2 },
-    { id: 5, name: 'Ddr3 - 16GB', price: 50, type: 'RAM', stock: 3 },
-    { id: 6, name: 'Ddr4 - 8GB', price: 50, type: 'RAM', stock: 4 },
-    { id: 7, name: 'Nvidia 2060', price: 50, type: 'GPU', stock: 0 },
-    { id: 8, name: 'Rx 580', price: 50, type: 'GPU', stock: 1 },
-  ]);
+
+  const [inventory, setInventory] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = inventory.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(inventory.length / itemsPerPage);
+
+  const handleDelete = async (id) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este componente de la base de datos?')) {
+      try {
+        await api.delete(`inventario/componentes/${id}/`);
+        
+        setInventory(inventory.filter(item => item.id !== id)); 
+  
+        triggerAlert('Componente eliminado con éxito de la base de datos');
+      } catch (error) {
+        console.error("Detalle del error al eliminar:", error.response?.data || error.message);
+        if (error.response?.status === 401) {
+          triggerAlert('Tu sesión expiró por seguridad. Vuelve a iniciar sesión.');
+        } else {
+          triggerAlert('Error al intentar eliminar el componente. Revisa la consola.');
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const response = await api.get('inventario/componentes/');
+        setInventory(response.data); 
+      } catch (error) {
+        console.error("Error al cargar el inventario:", error);
+      }
+    };
+
+    fetchInventory();
+  }, []);
 
   return (
     <div style={{ backgroundColor: '#f4f6f8', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -83,7 +114,7 @@ export default function Inventory() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {inventory.map((item, index) => (
+              {currentItems.map((item, index) => (
                 <div 
                   key={item.id} 
                   style={{ 
@@ -116,7 +147,7 @@ export default function Inventory() {
                     </Link>
                   </div>
                   <div>
-                    <button onClick={() => triggerAlert('Componente eliminado con éxito')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
+                    <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
                       <FiTrash2 size={18} />
                     </button>
                   </div>
@@ -126,13 +157,35 @@ export default function Inventory() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
-            <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
-              <button style={{ padding: '8px 16px', background: '#f5f5f5', border: 'none', borderRight: '1px solid #ddd', color: '#555', cursor: 'pointer', fontWeight: '600' }}>Anterior</button>
-              <button style={{ padding: '8px 16px', background: '#4CAF50', border: 'none', borderRight: '1px solid #ddd', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>1</button>
-              <button style={{ padding: '8px 16px', background: 'white', border: 'none', borderRight: '1px solid #ddd', color: '#4CAF50', cursor: 'pointer', fontWeight: 'bold' }}>2</button>
-              <button style={{ padding: '8px 16px', background: 'white', border: 'none', borderRight: '1px solid #ddd', color: '#4CAF50', cursor: 'pointer', fontWeight: 'bold' }}>3</button>
-              <button style={{ padding: '8px 16px', background: 'white', border: 'none', color: '#4CAF50', cursor: 'pointer', fontWeight: '600' }}>Siguiente</button>
-            </div>
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  style={{ padding: '8px 16px', background: currentPage === 1 ? '#f5f5f5' : 'white', border: 'none', borderRight: '1px solid #ddd', color: currentPage === 1 ? '#aaa' : '#4CAF50', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                >
+                  Anterior
+                </button>
+                
+                {[...Array(totalPages)].map((_, i) => (
+                  <button 
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    style={{ padding: '8px 16px', background: currentPage === i + 1 ? '#4CAF50' : 'white', border: 'none', borderRight: '1px solid #ddd', color: currentPage === i + 1 ? 'white' : '#4CAF50', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  style={{ padding: '8px 16px', background: currentPage === totalPages ? '#f5f5f5' : 'white', border: 'none', color: currentPage === totalPages ? '#aaa' : '#4CAF50', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
           </div>
 
         </div>
