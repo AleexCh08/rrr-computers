@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiSearch, FiShield, FiLock, FiUnlock, FiEdit2 } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
+import api from '../../services/api';
+import Modal from '../../components/ui/Modal';
 
 export default function AdminUsers() {
   const [alertMessage, setAlertMessage] = useState(null);
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const triggerAlert = (message) => {
     setAlertMessage(message);
@@ -12,14 +17,36 @@ export default function AdminUsers() {
     }, 3000);
   };
 
-  // Datos simulados de usuarios
-  const [users, setUsers] = useState([
-    { id: 'USR-001', name: 'Admin Principal', email: 'admin@rrrcomputers.com', role: 'Administrador', status: 'Activo', date: '2025-01-15' },
-    { id: 'USR-002', name: 'Carlos Pérez', email: 'carlos@mail.com', role: 'Cliente', status: 'Activo', date: '2026-03-10' },
-    { id: 'USR-003', name: 'Ana Gómez', email: 'ana.gomez@mail.com', role: 'Cliente', status: 'Activo', date: '2026-05-22' },
-    { id: 'USR-004', name: 'Usuario Sospechoso', email: 'spam123@mail.com', role: 'Cliente', status: 'Bloqueado', date: '2026-07-01' },
-    { id: 'USR-005', name: 'Luis Silva', email: 'luis.s@mail.com', role: 'Cliente', status: 'Inactivo', date: '2025-11-05' },
-  ]);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await api.get('usuarios/admin-users/');
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Error al cargar usuarios:", error);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  const handleToggleStatus = async (id, currentActiveState) => {
+    const newStatus = !currentActiveState; 
+    
+    try {
+      await api.patch(`usuarios/admin-users/${id}/`, { is_active: newStatus });
+      
+      setUsers(users.map(user => 
+        user.id === id ? { ...user, is_active: newStatus } : user
+      ));
+      
+      triggerAlert(`Usuario ${newStatus ? 'desbloqueado' : 'bloqueado'} con éxito.`);
+    } catch (error) {
+      console.error("Error al actualizar el usuario:", error);
+      triggerAlert("Error al intentar cambiar el estado del usuario.");
+    }
+  };
 
   // Función para estilos de estado y rol
   const getBadgeStyle = (type, value) => {
@@ -94,8 +121,11 @@ export default function AdminUsers() {
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {users.map((user, index) => {
-                const roleStyle = getBadgeStyle('role', user.role);
-                const statusStyle = getBadgeStyle('status', user.status);
+                const roleText = user.is_staff ? 'Administrador' : 'Cliente';
+                const statusText = user.is_active ? 'Activo' : 'Bloqueado';
+                
+                const roleStyle = getBadgeStyle('role', roleText);
+                const statusStyle = getBadgeStyle('status', statusText);
                 
                 return (
                   <div 
@@ -111,7 +141,7 @@ export default function AdminUsers() {
                     }}
                   >
                     <div style={{ fontWeight: '700', color: 'var(--text-dark)', fontSize: '0.9rem' }}>{user.id}</div>
-                    <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '600', color: '#333' }}>{user.name}</div>
+                    <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '600', color: '#333' }}>{user.first_name || user.username}</div>
                     <div style={{ textAlign: 'left', color: '#555', fontSize: '0.95rem' }}>{user.email}</div>
                     
                     {/* Badge de Rol */}
@@ -119,16 +149,10 @@ export default function AdminUsers() {
                       <span style={{ 
                         backgroundColor: roleStyle.bg, 
                         color: roleStyle.color, 
-                        padding: '4px 10px', 
-                        borderRadius: '20px', 
-                        fontSize: '0.8rem', 
-                        fontWeight: '700',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px'
+                        padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '5px'
                       }}>
-                        {user.role === 'Administrador' && <FiShield />}
-                        {user.role}
+                        {user.is_staff && <FiShield />}
+                        {roleText}
                       </span>
                     </div>
 
@@ -137,27 +161,23 @@ export default function AdminUsers() {
                       <span style={{ 
                         backgroundColor: statusStyle.bg, 
                         color: statusStyle.color, 
-                        padding: '4px 10px', 
-                        borderRadius: '20px', 
-                        fontSize: '0.8rem', 
-                        fontWeight: '700' 
+                        padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700' 
                       }}>
-                        {user.status}
+                        {statusText}
                       </span>
                     </div>
                     
                     {/* Botones de Acción */}
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                      <button onClick={() => triggerAlert(`Editando usuario ${user.name}`)} title="Editar Usuario" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
+                      <button onClick={() => { setSelectedUser(user); setShowModal(true); }} title="Editar Usuario" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
                         <FiEdit2 size={20} />
                       </button>
-                      
-                      {user.status === 'Bloqueado' ? (
-                        <button onClick={() => triggerAlert(`Usuario ${user.name} desbloqueado`)} title="Desbloquear" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4CAF50' }}>
+                      {!user.is_active ? (
+                        <button onClick={() => handleToggleStatus(user.id, user.is_active)} title="Desbloquear" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4CAF50' }}>
                           <FiUnlock size={20} />
                         </button>
                       ) : (
-                        <button onClick={() => triggerAlert(`Usuario ${user.name} bloqueado`)} title="Bloquear" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
+                        <button onClick={() => handleToggleStatus(user.id, user.is_active)} title="Bloquear" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
                           <FiLock size={20} />
                         </button>
                       )}
@@ -170,6 +190,37 @@ export default function AdminUsers() {
 
         </div>
       </main>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Datos del Perfil">
+        {selectedUser && (
+          <form style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }} onSubmit={(e) => { e.preventDefault(); setShowModal(false); }}>
+            
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Nombre Completo</label>
+              <input type="text" defaultValue={selectedUser.first_name || selectedUser.username} className="form-input" />
+            </div>
+            
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Correo Electrónico</label>
+              <input type="email" defaultValue={selectedUser.email} className="form-input" disabled style={{ backgroundColor: '#f5f5f5', color: '#888' }} />
+              <small style={{ color: '#888', display: 'block', marginTop: '4px' }}>El correo es el identificador principal y no se puede cambiar.</small>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Teléfono</label>
+              <input type="text" defaultValue="No registrado" className="form-input" disabled style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }} />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Dirección de Envío Principal</label>
+              <textarea defaultValue="No registrada" className="form-textarea" rows="3" disabled style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }}></textarea>
+            </div>
+
+            <div style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '10px', borderRadius: '4px', fontSize: '0.85rem', marginTop: '5px', marginBottom: '10px', textAlign: 'center' }}>
+              <strong>Nota:</strong> Teléfono y Dirección están bloqueados.
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
   );
 }
