@@ -4,6 +4,7 @@ import './Navbar.css';
 
 export default function Navbar() {
   const location = useLocation();
+  const isAuthenticated = Boolean(localStorage.getItem('access_token'));
   const getLinkStyle = (path) => {
     const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
     
@@ -38,9 +39,10 @@ export default function Navbar() {
             <FiSearch color="#888" />
             <input type="text" placeholder="Search" />
           </div>
-          <Link to="/login" style={{ color: 'inherit' }}>
-            <FiUser size={24} style={{ cursor: 'pointer' }} />
+          <Link to={isAuthenticated ? "/mi-cuenta" : "/login"} style={{ color: 'inherit' }} title={isAuthenticated ? "Mi Cuenta" : "Iniciar Sesión"}>
+            <FiUser size={24} style={{ cursor: 'pointer', color: isAuthenticated ? 'var(--accent-green)' : 'inherit' }} />
           </Link>
+          
           <Link to="/carrito" style={{ color: 'inherit' }}>
             <FiShoppingCart size={24} style={{ cursor: 'pointer' }} />
           </Link>

@@ -1,30 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiUser, FiPackage, FiHeart, FiSettings, FiLogOut } from 'react-icons/fi';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
+import api from '../services/api';
 
 export default function MyAccount() {
-  // Estado para controlar qué pestaña está activa
   const [activeTab, setActiveTab] = useState('orders');
 
-  // Datos de prueba del usuario
-  const user = {
-    name: 'Carlos Pérez',
-    email: 'carlos@mail.com',
-    phone: '+58 412 1234567',
-    address: 'Av. Principal, Edif. Centro, Piso 4, Caracas'
+  const [user, setUser] = useState({ name: '', email: '', phone: 'No registrado', address: 'No registrada' });
+  const [myOrders, setMyOrders] = useState([]);
+  const [myDonations, setMyDonations] = useState([]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await api.get('usuarios/perfil/');
+        setUser({
+          name: response.data.first_name || response.data.username,
+          email: response.data.email,
+          phone: 'No registrado',
+          address: 'No registrada'
+        });
+        
+        // Más adelante cargaremos myOrders y myDonations aquí
+      } catch (error) {
+        console.error("Error al cargar perfil:", error);
+        if (error.response?.status === 401) {
+          window.location.href = '/login'; 
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    window.location.href = '/login';
   };
-
-  // Datos simulados de órdenes del cliente
-  const myOrders = [
-    { id: '1026', date: '25/07/2026', total: 450, status: 'Procesando' },
-    { id: '0984', date: '10/06/2026', total: 85, status: 'Entregado' },
-  ];
-
-  // Datos simulados de donaciones del cliente
-  const myDonations = [
-    { id: 'DON-045', date: '20/07/2026', item: 'Monitor Dell 24"', status: 'Pendiente' },
-  ];
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -81,6 +95,7 @@ export default function MyAccount() {
               </button>
 
               <button 
+                onClick={handleLogout}
                 style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px 20px', background: 'white', border: 'none', borderLeft: '4px solid transparent', cursor: 'pointer', textAlign: 'left', fontWeight: '500', color: '#d9534f', borderTop: '1px solid #eee' }}
               >
                 <FiLogOut size={18} /> Cerrar Sesión

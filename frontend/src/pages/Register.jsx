@@ -3,14 +3,53 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Footer from '../components/layout/Footer';
 import Modal from '../components/ui/Modal';
+import api from '../services/api';
 
 export default function Register() {
   const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [error, setError] = useState('');
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowModal(true);
+    setError(''); 
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden.');
+      return;
+    }
+
+    try {
+      await api.post('usuarios/registro/', {
+        username: formData.email, 
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.name
+      });
+      
+      setShowModal(true);
+    } catch (err) {
+      console.error("Detalle del error al registrar:", err.response?.data || err.message);
+      
+      if (err.response?.data && typeof err.response.data === 'object') {
+        const firstErrorKey = Object.keys(err.response.data)[0];
+        const firstErrorMessage = err.response.data[firstErrorKey][0];
+        
+        if (firstErrorKey === 'username') {
+          setError(`Error con el correo: ${firstErrorMessage}`);
+        } else {
+          setError(`Error en ${firstErrorKey}: ${firstErrorMessage}`);
+        }
+      } else {
+        setError('Error de conexión. ¿Está encendido el servidor de Django?');
+      }
+    }
   };
 
   const handleClose = () => {
@@ -38,25 +77,31 @@ export default function Register() {
         >
           <h1 style={{ fontSize: '2.2rem', color: 'var(--text-dark)', marginBottom: '30px' }}>Crear una Cuenta</h1>
           
+          {error && (
+            <div style={{ color: '#d9534f', backgroundColor: '#fde0e3', padding: '10px', borderRadius: '5px', marginBottom: '15px', fontWeight: '600' }}>
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Nombre Completo</label>
-              <input type="text" required className="form-input" placeholder="Nombre de Usuario" style={{ textAlign: 'center' }} />
+              <input type="text" name="name" value={formData.name} onChange={handleChange} required className="form-input" placeholder="Tu nombre" style={{ textAlign: 'center' }} />
             </div>
             
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Correo</label>
-              <input type="email" required className="form-input" placeholder="Correo Electrónico" style={{ textAlign: 'center' }} />
+              <input type="email" name="email" value={formData.email} onChange={handleChange} required className="form-input" placeholder="Correo Electrónico" style={{ textAlign: 'center' }} />
             </div>
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Contraseña</label>
-              <input type="password" required className="form-input" placeholder="Contraseña" style={{ textAlign: 'center' }} />
+              <input type="password" name="password" value={formData.password} onChange={handleChange} required className="form-input" placeholder="Contraseña" style={{ textAlign: 'center' }} />
             </div>
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Confirmar Contraseña</label>
-              <input type="password" required className="form-input" placeholder="Confirmar Contraseña" style={{ textAlign: 'center' }} />
+              <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required className="form-input" placeholder="Confirmar Contraseña" style={{ textAlign: 'center' }} />
             </div>
 
             <button type="submit" className="btn-primary" style={{ marginTop: '15px', padding: '12px 30px', fontSize: '1.1rem', backgroundColor: '#4CAF50', alignSelf: 'center' }}>
