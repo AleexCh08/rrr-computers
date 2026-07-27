@@ -32,4 +32,4 @@ class Return(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Devolución #{self.id} - {self.item_name}"
+        return f"Ticket #{self.id} - {self.client_name}"
