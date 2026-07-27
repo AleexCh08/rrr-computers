@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiCheck, FiX, FiSearch, FiEye } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
+import api from '../../services/api';
 
 export default function AdminDonations() {
-  // Estado para la alerta visual de acciones
   const [alertMessage, setAlertMessage] = useState(null);
 
   const triggerAlert = (message) => {
@@ -13,15 +13,34 @@ export default function AdminDonations() {
     }, 3000);
   };
 
-  // Datos simulados de solicitudes de donación
-  const [donations, setDonations] = useState([
-    { id: 1, date: '2026-07-20', donor: 'Carlos Pérez', item: 'Monitor Dell 24"', condition: 'Usado (Buen estado)', status: 'Pendiente' },
-    { id: 2, date: '2026-07-22', donor: 'Ana Gómez', item: 'Teclado Mecánico', condition: 'Nuevo', status: 'Aprobado' },
-    { id: 3, date: '2026-07-15', donor: 'Luis Silva', item: 'Laptop HP (Piezas)', condition: 'Dañado', status: 'Recibido' },
-    { id: 4, date: '2026-07-24', donor: 'María López', item: 'Memoria RAM 8GB', condition: 'Usado (Buen estado)', status: 'Rechazado' },
-  ]);
+  const [donations, setDonations] = useState([]);
 
-  // Función para determinar el color del badge de estado
+  useEffect(() => {
+    const fetchDonations = async () => {
+      try {
+        const response = await api.get('inventario/donaciones/');
+        setDonations(response.data);
+      } catch (error) {
+        console.error("Error al cargar donaciones:", error);
+      }
+    };
+    fetchDonations();
+  }, []);
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await api.patch(`inventario/donaciones/${id}/`, { status: newStatus });
+      setDonations(donations.map(don => 
+        don.id === id ? { ...don, status: newStatus } : don
+      ));
+      
+      triggerAlert(`Donación marcada como ${newStatus}`);
+    } catch (error) {
+      console.error("Error al actualizar la donación:", error);
+    }
+  };
+
+
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Pendiente': return { bg: '#fff3cd', color: '#856404' }; // Amarillo
@@ -102,9 +121,9 @@ export default function AdminDonations() {
                       borderBottom: '1px solid #eaeaea'
                     }}
                   >
-                    <div style={{ color: '#666', fontSize: '0.9rem' }}>{item.date}</div>
-                    <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '600', color: '#333' }}>{item.donor}</div>
-                    <div style={{ textAlign: 'left', color: '#444' }}>{item.item}</div>
+                    <div style={{ color: '#666', fontSize: '0.9rem' }}>{item.created_at.split('T')[0]}</div>
+                    <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '600', color: '#333' }}>{item.donor_name}</div>
+                    <div style={{ textAlign: 'left', color: '#444' }}>{item.item_name}</div>
                     <div style={{ color: '#555', fontSize: '0.9rem' }}>{item.condition}</div>
                     
                     {/* Badge de Estado */}
@@ -126,10 +145,12 @@ export default function AdminDonations() {
                       <button onClick={() => triggerAlert('Mostrando detalles de la donación...')} title="Ver Detalles" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
                         <FiEye size={20} />
                       </button>
-                      <button onClick={() => triggerAlert('Donación aprobada')} title="Aprobar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4CAF50' }}>
+                      
+                      {/* Conectamos los botones reales */}
+                      <button onClick={() => handleStatusChange(item.id, 'Aprobado')} title="Aprobar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4CAF50' }}>
                         <FiCheck size={20} />
                       </button>
-                      <button onClick={() => triggerAlert('Donación rechazada')} title="Rechazar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
+                      <button onClick={() => handleStatusChange(item.id, 'Rechazado')} title="Rechazar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
                         <FiX size={20} />
                       </button>
                     </div>
