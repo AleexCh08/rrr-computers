@@ -21,6 +21,9 @@ export default function MyAccount() {
           phone: 'No registrado',
           address: 'No registrada'
         });
+
+        const donacionesRes = await api.get('inventario/donaciones/mis_donaciones/');
+        setMyDonations(donacionesRes.data);
         
         // Más adelante cargaremos myOrders y myDonations aquí
       } catch (error) {
@@ -129,18 +132,24 @@ export default function MyAccount() {
             {activeTab === 'donations' && (
               <div>
                 <h2 style={{ fontSize: '1.5rem', color: 'var(--text-dark)', marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #eee' }}>Mis Donaciones</h2>
-                {myDonations.map(donation => (
-                  <div key={donation.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', border: '1px solid #eaeaea', borderRadius: '6px', marginBottom: '15px' }}>
-                    <div>
-                      <h4 style={{ margin: '0 0 5px 0', color: 'var(--text-dark)', fontSize: '1.1rem' }}>{donation.item}</h4>
-                      <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>Registrada el {donation.date}</p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ margin: '0 0 5px 0', color: '#888', fontSize: '0.85rem' }}>ID: {donation.id}</p>
-                      <span style={{ color: getStatusColor(donation.status), fontWeight: '700', fontSize: '0.9rem' }}>{donation.status}</span>
-                    </div>
+                {myDonations.length === 0 ? (
+                  <div style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f9f9f9', borderRadius: '8px', border: '1px dashed #ccc' }}>
+                    <p style={{ color: '#666', fontSize: '1.1rem', margin: 0 }}>No has realizado ninguna donación aún.</p>
                   </div>
-                ))}
+                ) : (
+                  myDonations.map(donation => (
+                    <div key={donation.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', border: '1px solid #eaeaea', borderRadius: '6px', marginBottom: '15px' }}>
+                      <div>
+                        <h4 style={{ margin: '0 0 5px 0', color: 'var(--text-dark)', fontSize: '1.1rem' }}>{donation.item_name}</h4>
+                        <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>Registrada el {donation.created_at.split('T')[0]}</p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ margin: '0 0 5px 0', color: '#888', fontSize: '0.85rem' }}>ID: DON-00{donation.id}</p>
+                        <span style={{ color: getStatusColor(donation.status), fontWeight: '700', fontSize: '0.9rem' }}>{donation.status}</span>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             )}
 

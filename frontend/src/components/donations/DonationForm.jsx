@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import Modal from '../ui/Modal';
 import api from '../../services/api';
@@ -8,6 +8,26 @@ export default function DonationForm() {
   const [donorData, setDonorData] = useState({
     name: '', email: '', phone: '', address: '', state: '', comments: ''
   });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (localStorage.getItem('access_token')) {
+        try {
+          const response = await api.get('usuarios/perfil/');
+          setDonorData(prevData => ({
+            ...prevData,
+            name: response.data.first_name || response.data.username || '',
+            email: response.data.email || ''
+          }));
+        } catch (error) {
+          console.error("El usuario no está autenticado. Formulario público.");
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const [componentsList, setComponentsList] = useState([
     { id: Date.now(), type: '', condition: '', brand: '', description: '' }
   ]);
