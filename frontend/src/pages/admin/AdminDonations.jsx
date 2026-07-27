@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FiCheck, FiX, FiSearch, FiEye } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import api from '../../services/api';
+import Modal from '../../components/ui/Modal';
 
 export default function AdminDonations() {
   const [alertMessage, setAlertMessage] = useState(null);
@@ -13,6 +14,8 @@ export default function AdminDonations() {
     }, 3000);
   };
 
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDonation, setSelectedDonation] = useState(null);
   const [donations, setDonations] = useState([]);
 
   useEffect(() => {
@@ -142,15 +145,37 @@ export default function AdminDonations() {
                     
                     {/* Botones de Acción */}
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                      <button onClick={() => triggerAlert('Mostrando detalles de la donación...')} title="Ver Detalles" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
+                      <button onClick={() => { setSelectedDonation(item); setShowModal(true); }} title="Ver Detalles" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
                         <FiEye size={20} />
                       </button>
                       
                       {/* Conectamos los botones reales */}
-                      <button onClick={() => handleStatusChange(item.id, 'Aprobado')} title="Aprobar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4CAF50' }}>
+                      <button 
+                        onClick={() => handleStatusChange(item.id, 'Aprobado')} 
+                        disabled={item.status !== 'Pendiente'}
+                        title="Aprobar" 
+                        style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          cursor: item.status !== 'Pendiente' ? 'not-allowed' : 'pointer', 
+                          color: '#4CAF50', 
+                          opacity: item.status !== 'Pendiente' ? 0.3 : 1 
+                        }}
+                      >
                         <FiCheck size={20} />
                       </button>
-                      <button onClick={() => handleStatusChange(item.id, 'Rechazado')} title="Rechazar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
+                      <button 
+                        onClick={() => handleStatusChange(item.id, 'Rechazado')} 
+                        disabled={item.status !== 'Pendiente'}
+                        title="Rechazar" 
+                        style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          cursor: item.status !== 'Pendiente' ? 'not-allowed' : 'pointer', 
+                          color: '#d9534f', 
+                          opacity: item.status !== 'Pendiente' ? 0.3 : 1 
+                        }}
+                      >
                         <FiX size={20} />
                       </button>
                     </div>
@@ -162,6 +187,31 @@ export default function AdminDonations() {
 
         </div>
       </main>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Detalles Completos de la Donación">
+        {selectedDonation && (
+          <div style={{ textAlign: 'left', color: '#333', fontSize: '1.05rem', lineHeight: '1.8' }}>
+            <div style={{ marginBottom: '15px', paddingBottom: '15px', borderBottom: '1px solid #eee' }}>
+              <h4 style={{ color: '#5A7D9A', marginBottom: '10px' }}>Datos del Donante</h4>
+              <p><strong>Nombre:</strong> {selectedDonation.donor_name}</p>
+              <p><strong>Email:</strong> {selectedDonation.email}</p>
+              <p><strong>Teléfono:</strong> {selectedDonation.phone}</p>
+              <p><strong>Dirección:</strong> {selectedDonation.address}</p>
+            </div>
+            
+            <div>
+              <h4 style={{ color: '#5A7D9A', marginBottom: '10px' }}>Detalles del Componente</h4>
+              <p><strong>Pieza:</strong> {selectedDonation.item_name}</p>
+              <p><strong>Condición Declarada:</strong> {selectedDonation.condition}</p>
+              <p><strong>Fecha de Solicitud:</strong> {selectedDonation.created_at.split('T')[0]}</p>
+              
+              <div style={{ marginTop: '15px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}>
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>Descripción y Notas:</p>
+                <p style={{ fontSize: '0.95rem' }}>{selectedDonation.description || 'Sin comentarios adicionales.'}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

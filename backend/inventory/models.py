@@ -39,10 +39,14 @@ class Donation(models.Model):
     ]
 
     donor_name = models.CharField(max_length=255)
+    email = models.EmailField(blank=True, null=True) 
+    phone = models.CharField(max_length=50, blank=True, null=True) 
+    address = models.TextField(blank=True, null=True) 
     item_name = models.CharField(max_length=255)
-    condition = models.CharField(max_length=100)
+    condition = models.CharField(max_length=50)
+    description = models.TextField(blank=True, null=True) 
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pendiente')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Donación: {self.item_name} - {self.status}"
+        return f"Donación: {self.item_name} - {self.donor_name}"

@@ -23,10 +23,13 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.warn("Sesión expirada. Redirigiendo al login...");
-      localStorage.removeItem('access_token'); 
+      console.warn("Token inválido o expirado. Limpiando credenciales...");
+      localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
-      window.location.href = '/admin/login'; 
+
+      if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
+        window.location.href = '/admin/login';
+      }
     }
     return Promise.reject(error);
   }
