@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FiDollarSign, FiShoppingBag, FiInbox, FiAlertTriangle, FiArrowUpRight, FiClock, FiMail } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
+import Modal from '../../components/ui/Modal';
 import api from '../../services/api';
 
 export default function AdminDashboard() {
@@ -8,6 +9,7 @@ export default function AdminDashboard() {
   const [stockAlerts, setStockAlerts] = useState(0);
   const [recentActivity, setRecentActivity] = useState([]);
   const [totalMessages, setTotalMessages] = useState(0);
+  const [showActivityModal, setShowActivityModal] = useState(false);
 
   useEffect(() => {
     const fetchDashboardMetrics = async () => {
@@ -56,7 +58,7 @@ export default function AdminDashboard() {
 
         const combinedActivity = [...formattedDonations, ...formattedReturns, ...formattedUsers, ...formattedMessages]
           .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, 4);
+          .slice(0, 20);
 
         setRecentActivity(combinedActivity);
 
@@ -185,7 +187,7 @@ export default function AdminDashboard() {
               {recentActivity.length === 0 ? (
                 <p style={{ color: '#888', textAlign: 'center', fontSize: '0.95rem' }}>No hay actividad reciente.</p>
               ) : (
-                recentActivity.map((activity) => (
+                recentActivity.slice(0, 4).map((activity) => (
                   <div key={activity.id} style={{ display: 'flex', gap: '15px', alignItems: 'flex-start', borderBottom: '1px solid #f0f0f0', paddingBottom: '15px' }}>
                     <div style={{ marginTop: '3px', color: '#888' }}>
                       <FiClock size={18} />
@@ -198,14 +200,35 @@ export default function AdminDashboard() {
                 ))
               )}
             </div>
-            
-            <button style={{ width: '100%', marginTop: '15px', padding: '10px', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', color: '#5A7D9A', fontWeight: '600', cursor: 'pointer' }}>
-              Ver todo
-            </button>
+
+            {recentActivity.length > 4 && (
+              <button onClick={() => setShowActivityModal(true)} style={{ display: 'block', margin: '15px auto 0', width: '50%', padding: '10px', background: '#4CAF50', border: '1px solid #ddd', borderRadius: '4px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}>
+                Ver todo ({recentActivity.length})
+              </button>
+            )}
           </div>
 
         </div>
       </main>
+      <Modal isOpen={showActivityModal} onClose={() => setShowActivityModal(false)} title="Historial de Actividad">
+        <p style={{ textAlign: 'center', color: '#888', fontSize: '0.85rem', margin: '-20px 0 20px 0' }}>
+          (Últimos 20)
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxHeight: '60vh', overflowY: 'auto', paddingRight: '10px' }}>
+          {recentActivity.map((activity) => (
+            <div key={`modal-${activity.id}`} style={{ display: 'flex', gap: '15px', alignItems: 'flex-start', borderBottom: '1px solid #f0f0f0', paddingBottom: '15px' }}>
+              <div style={{ marginTop: '3px', color: '#888' }}>
+                <FiClock size={18} />
+              </div>
+              <div>
+                <p style={{ margin: 0, color: 'var(--text-dark)', fontWeight: '500', fontSize: '1rem' }}>{activity.text}</p>
+                <span style={{ fontSize: '0.85rem', color: '#999', fontWeight: '600' }}>{activity.time}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+      </Modal>
     </div>
   );
 }
