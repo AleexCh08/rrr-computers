@@ -14,6 +14,7 @@ export default function Catalog() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('Todos');
+  const [subCategory, setSubCategory] = useState('Todos');
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(5000);
 
@@ -22,10 +23,28 @@ export default function Catalog() {
 
   const filteredComponents = components.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = category === 'Todos' || item.type === category;
-    const matchesPrice = item.price >= minPrice && item.price <= maxPrice;
+    const matchesCategory = category === 'Todos' || item.category === category;
+    let matchesSubCategory = false;
+    if (subCategory === 'Todos') {
+      matchesSubCategory = true;
+    } else {
+      const safeType = item.type ? item.type.toLowerCase() : '';
+      
+      if (subCategory === 'Tarjeta Gráfica') {
+        matchesSubCategory = safeType.includes('tarjeta gráfica') || safeType.includes('tarjeta grafica') || safeType.includes('gpu') || safeType.includes('video');
+      } else if (subCategory === 'Tarjeta Madre') {
+        matchesSubCategory = safeType.includes('tarjeta madre') || safeType.includes('motherboard') || safeType.includes('placa base');
+      } else if (subCategory === 'Procesador') {
+        matchesSubCategory = safeType.includes('procesador') || safeType.includes('cpu');
+      } else if (subCategory === 'Ram') {
+        matchesSubCategory = safeType.includes('ram') || safeType.includes('memoria');
+      } else {
+        matchesSubCategory = safeType === subCategory.toLowerCase();
+      }
+    }
     
-    return matchesSearch && matchesCategory && matchesPrice;
+    const matchesPrice = item.price >= minPrice && item.price <= maxPrice;  
+    return matchesSearch && matchesCategory && matchesSubCategory && matchesPrice;
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -83,6 +102,8 @@ export default function Catalog() {
             <SidebarFilters 
               category={category}
               setCategory={setCategory}
+              subCategory={subCategory}          
+              setSubCategory={setSubCategory}
               minPrice={minPrice}
               setMinPrice={setMinPrice}
               maxPrice={maxPrice}

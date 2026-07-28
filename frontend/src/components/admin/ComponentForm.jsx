@@ -7,6 +7,7 @@ export default function ComponentForm({ initialData = null, isEdit = false }) {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
+    category: 'Componente', 
     type: '',
     stock: '',
     condition: 'nuevo',
@@ -55,15 +56,45 @@ export default function ComponentForm({ initialData = null, isEdit = false }) {
         </div>
 
         <div>
-          <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Tipo / Categoría</label>
-          <select name="type" value={formData.type} onChange={handleChange} required className="form-select">
+          <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Categoría Principal</label>
+          <select 
+            name="category" 
+            value={formData.category} 
+            onChange={(e) => {
+              const newCategory = e.target.value;
+              setFormData({
+                ...formData,
+                category: newCategory,
+                type: newCategory === 'PC' ? 'N/A' : formData.type 
+              });
+            }} 
+            required 
+            className="form-select"
+          >
+            <option value="Componente">Componente Suelto</option>
+            <option value="PC">PC Completa</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="form-label" style={{ fontWeight: '600', color: formData.category === 'PC' ? '#aaa' : '#333', marginBottom: '8px', display: 'block' }}>Tipo / Pieza</label>
+          <select 
+            name="type" 
+            value={formData.type} 
+            onChange={handleChange} 
+            required 
+            className="form-select"
+            disabled={formData.category === 'PC'}
+            style={{ backgroundColor: formData.category === 'PC' ? '#f5f5f5' : 'white' }}
+          >
             <option value="">Seleccione una opción</option>
-            <option value="CPU">Procesador (CPU)</option>
-            <option value="RAM">Memoria RAM</option>
-            <option value="GPU">Tarjeta Gráfica (GPU)</option>
-            <option value="MOBO">Tarjeta Madre</option>
+            <option value="Procesador">Procesador (CPU)</option>
+            <option value="Ram">Memoria RAM</option>
+            <option value="Tarjeta Gráfica">Tarjeta Gráfica (GPU)</option>
+            <option value="Tarjeta Madre">Tarjeta Madre</option>
             <option value="PSU">Fuente de Poder</option>
             <option value="STORAGE">Almacenamiento</option>
+            <option value="N/A">No Aplica (Para PCs)</option>
           </select>
         </div>
 

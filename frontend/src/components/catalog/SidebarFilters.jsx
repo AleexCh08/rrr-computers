@@ -1,6 +1,7 @@
-export default function SidebarFilters({ category, setCategory, minPrice, setMinPrice, maxPrice, setMaxPrice, setCurrentPage }) {
+export default function SidebarFilters({ category, setCategory, subCategory, setSubCategory, minPrice, setMinPrice, maxPrice, setMaxPrice, setCurrentPage }) {
   const handleCategoryChange = (newCat) => {
     setCategory(newCat);
+    setSubCategory('Todos'); 
     setCurrentPage(1);
   };
 
@@ -29,6 +30,27 @@ export default function SidebarFilters({ category, setCategory, minPrice, setMin
           
         </div>
       </div>
+
+      {category === 'Componente' && (
+        <div style={{ marginBottom: '25px', padding: '15px', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #ddd' }}>
+          <h4 style={{ fontSize: '0.95rem', marginBottom: '15px', color: 'var(--text-dark)' }}>Tipo de Componente</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.9rem' }}>
+            
+            {['Todos', 'Ram', 'Tarjeta Madre', 'Procesador', 'Tarjeta Gráfica'].map((type) => (
+              <label key={type} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: subCategory === type ? 'var(--accent-green)' : '#555', fontWeight: subCategory === type ? '700' : '500' }}>
+                <input 
+                  type="radio" 
+                  checked={subCategory === type} 
+                  onChange={() => { setSubCategory(type); setCurrentPage(1); }} 
+                  style={{ cursor: 'pointer' }} 
+                /> 
+                {type}
+              </label>
+            ))}
+
+          </div>
+        </div>
+      )}
 
       {/* Filtro Dinámico de Precio */}
       <div style={{ marginBottom: '25px' }}>

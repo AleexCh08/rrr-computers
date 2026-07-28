@@ -104,9 +104,10 @@ export default function Inventory() {
           )}
 
           <div style={{ border: '1px solid #eaeaea', borderRadius: '8px', overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 100px 100px', backgroundColor: '#4CAF50', color: 'white', fontWeight: '600', padding: '15px', textAlign: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 100px 100px', backgroundColor: '#4CAF50', color: 'white', fontWeight: '600', padding: '15px', textAlign: 'center' }}>
               <div style={{ textAlign: 'left', paddingLeft: '10px' }}>Nombre</div>
               <div>Precio</div>
+              <div>Categoría</div>
               <div>Tipo</div>
               <div>Stock</div>
               <div>Editar</div>
@@ -119,7 +120,7 @@ export default function Inventory() {
                   key={item.id} 
                   style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: '2fr 1fr 1fr 1fr 100px 100px', 
+                    gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 100px 100px', 
                     backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white', 
                     padding: '12px 15px', 
                     textAlign: 'center', 
@@ -129,9 +130,20 @@ export default function Inventory() {
                 >
                   <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '500', color: '#333' }}>{item.name}</div>
                   <div style={{ color: '#555' }}>${item.price}</div>
+                  
+                  <div>
+                    <span style={{ 
+                      backgroundColor: item.category === 'PC' ? '#e3f2fd' : '#f3e5f5', 
+                      color: item.category === 'PC' ? '#1976d2' : '#7b1fa2', 
+                      padding: '4px 10px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' 
+                    }}>
+                      {item.category || 'Componente'}
+                    </span>
+                  </div>
+
                   <div>
                     <span style={{ backgroundColor: '#e2e8f0', color: '#475569', padding: '4px 10px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' }}>
-                      {item.type}
+                      {item.category === 'PC' ? '-' : item.type}
                     </span>
                   </div>
                   <div>

@@ -2,12 +2,8 @@ from django.db import models
 
 class Component(models.Model):
     CATEGORY_CHOICES = [
-        ('CPU', 'Procesador (CPU)'),
-        ('RAM', 'Memoria RAM'),
-        ('GPU', 'Tarjeta Gráfica (GPU)'),
-        ('MOBO', 'Tarjeta Madre'),
-        ('PSU', 'Fuente de Poder'),
-        ('STORAGE', 'Almacenamiento'),
+        ('PC', 'PC Completa'),
+        ('Componente', 'Componente Suelto'),
     ]
 
     CONDITION_CHOICES = [
@@ -18,7 +14,8 @@ class Component(models.Model):
 
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    type = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Componente')
+    type = models.CharField(max_length=100)
     stock = models.PositiveIntegerField(default=0)
     condition = models.CharField(max_length=50, choices=CONDITION_CHOICES, default='nuevo')
     description = models.TextField(blank=True, null=True)
