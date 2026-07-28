@@ -23,6 +23,7 @@ import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminReturns from './pages/admin/AdminReturns.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
+import AdminMessages from './pages/admin/AdminMessages.jsx';
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
         <Route path="/admin/donaciones" element={<AdminDonations />} />
         <Route path="/admin/ordenes" element={<AdminOrders />} />
         <Route path="/admin/devoluciones" element={<AdminReturns />} />
+        <Route path="/admin/mensajes" element={<AdminMessages />} />       
         <Route path="/admin/usuarios" element={<AdminUsers />} />
       </Routes>
     </Router>
