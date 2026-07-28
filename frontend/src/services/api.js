@@ -23,12 +23,18 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.warn("Token inválido o expirado. Limpiando credenciales...");
+      console.warn("Token inválido o expirado. Limpiando credenciales y redirigiendo...");
+      
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
 
-      if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
+      const currentPath = window.location.pathname;
+
+      if (currentPath.startsWith('/admin') && currentPath !== '/admin/login') {
         window.location.href = '/admin/login';
+      } 
+      else if (!currentPath.startsWith('/admin') && currentPath !== '/login') {
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);
