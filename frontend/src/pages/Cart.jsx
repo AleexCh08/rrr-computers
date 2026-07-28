@@ -1,38 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiTrash2, FiMinus, FiPlus } from 'react-icons/fi';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
-import imgPc from '../assets/foto-pc.png'; // Usamos una imagen de prueba por ahora
 
 export default function Cart() {
-  // Estado simulado del carrito
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Tarjeta Madre FGD444", price: 50, quantity: 1, image: imgPc },
-    { id: 2, name: "Procesador Intel Core I5", price: 50, quantity: 1, image: imgPc },
-    { id: 3, name: "Tarjeta Grafica NVIDIA RTX5940", price: 100, quantity: 1, image: imgPc }
-  ]);
+  const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState(() => {
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  useEffect(() => {
+    if (!localStorage.getItem('access_token')) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   // Lógica para actualizar cantidades
   const updateQuantity = (id, delta) => {
     setCartItems(cartItems.map(item => {
       if (item.id === id) {
         const newQty = item.quantity + delta;
-        return { ...item, quantity: newQty > 0 ? newQty : 1 }; // Evita bajar de 1
+        return { ...item, quantity: newQty > 0 ? newQty : 1 }; 
       }
       return item;
     }));
   };
 
-  // Lógica para eliminar item
   const removeItem = (id) => {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
   // Cálculos
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const shipping = subtotal > 0 ? 10 : 0; // Costo de envío fijo de ejemplo
+  const shipping = subtotal > 0 ? 10 : 0; 
   const total = subtotal + shipping;
 
   return (

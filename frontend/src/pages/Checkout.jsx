@@ -1,33 +1,69 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiCreditCard, FiTruck, FiShield, FiCheckCircle } from 'react-icons/fi';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import Modal from '../components/ui/Modal';
+import api from '../services/api';
 
 export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState('tarjeta');
   const [showModal, setShowModal] = useState(false);
+  const [clientName, setClientName] = useState('');
   const navigate = useNavigate();
 
-  // Simulación de los productos en el carrito
-  const cartItems = [
-    { id: 1, name: 'Intel Core i5-10400F', price: 120, qty: 1 },
-    { id: 2, name: 'Memoria RAM Corsair 16GB', price: 65, qty: 2 },
-  ];
+  useEffect(() => {
+    const checkAuthAndFetchData = async () => {
+      if (!localStorage.getItem('access_token')) {
+        navigate('/login');
+        return;
+      }
 
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
-  const shippingCost = 15;
+      try {
+        const response = await api.get('usuarios/perfil/');
+        setClientName(response.data.first_name || response.data.username);
+      } catch (error) {
+        console.error("Error validando sesión:", error);
+        navigate('/login');
+      }
+    };
+
+    checkAuthAndFetchData();
+  }, [navigate]);
+
+  const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      navigate('/catalogo');
+    }
+  }, [cartItems, navigate]);
+
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const shippingCost = subtotal > 0 ? 15 : 0;
   const total = subtotal + shippingCost;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowModal(true);
+    
+    try {
+      await api.post('ordenes/', {
+        client: clientName,
+        total: total,
+        status: 'Procesando'
+      });
+
+      localStorage.removeItem('cart');
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error procesando el pago:", error);
+      alert("Hubo un error al procesar tu pago con el servidor.");
+    }
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    navigate('/mi-cuenta'); // Redirige al perfil para ver la orden
+    navigate('/mi-cuenta'); 
   };
 
   return (
@@ -57,7 +93,14 @@ export default function Checkout() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Nombre Completo</label>
-                  <input type="text" required className="form-input" placeholder="Ej. Carlos Pérez" />
+                  <input 
+                    type="text" 
+                    required 
+                    className="form-input" 
+                    placeholder="Ej. Carlos Pérez" 
+                    value={clientName} 
+                    onChange={(e) => setClientName(e.target.value)} 
+                  />
                 </div>
                 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -152,10 +195,10 @@ export default function Checkout() {
                 <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <p style={{ margin: 0, fontWeight: '600', color: '#333', fontSize: '0.95rem' }}>{item.name}</p>
-                    <span style={{ color: '#888', fontSize: '0.85rem' }}>Cant: {item.qty}</span>
+                    <span style={{ color: '#888', fontSize: '0.85rem' }}>Cant: {item.quantity}</span> 
                   </div>
                   <div style={{ fontWeight: '600', color: 'var(--text-dark)' }}>
-                    ${item.price * item.qty}
+                    ${item.price * item.quantity}
                   </div>
                 </div>
               ))}

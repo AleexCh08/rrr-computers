@@ -1,20 +1,37 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import ProductCard from '../components/ui/ProductCard';
 import SidebarFilters from '../components/catalog/SidebarFilters';
 import HelpBanner from '../components/catalog/HelpBanner';
+import api from '../services/api';
 
 import imgPc from '../assets/foto-pc.png'; 
 
 export default function Catalog() {
-  const catalogItems = Array.from({ length: 9 }).map((_, index) => ({
-    id: index + 1,
-    image: imgPc,
-    title: `Computadora ${index + 1}`, 
-    price: "89",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-  }));
+  const [components, setComponents] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; 
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = components.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(components.length / itemsPerPage);
+
+  useEffect(() => {
+    const fetchComponents = async () => {
+      try {
+        const response = await api.get('inventario/componentes/');
+        const availableItems = response.data.filter(item => item.stock > 0);
+        setComponents(availableItems);
+      } catch (error) {
+        console.error("Error al cargar el catálogo:", error);
+      }
+    };
+    fetchComponents();
+  }, []);
 
   return (
     <div className="page-container" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
@@ -45,26 +62,52 @@ export default function Catalog() {
 
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '50px' }}>
-                {catalogItems.map(item => (
-                  <ProductCard 
-                    key={item.id}
-                    id={item.id}
-                    image={item.image}
-                    title={item.title}
-                    price={item.price}
-                    description={item.description}
-                  />
-                ))}
+                {currentItems.length === 0 ? (
+                  <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#666', fontSize: '1.2rem' }}>No hay componentes disponibles en este momento.</p>
+                ) : (
+                  currentItems.map(item => (
+                    <ProductCard 
+                      key={item.id}
+                      id={item.id}
+                      image={imgPc}
+                      title={item.name}
+                      price={item.price}
+                      description={item.description || 'Sin descripción detallada.'} 
+                    />
+                  ))
+                )}
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
-                  <button style={{ padding: '10px 20px', background: '#f5f5f5', border: 'none', borderRight: '1px solid #ddd', color: '#555', cursor: 'pointer', fontWeight: '600' }}>Anterior</button>
-                  <button style={{ padding: '10px 20px', background: 'var(--accent-green)', border: 'none', borderRight: '1px solid #ddd', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>1</button>
-                  <button style={{ padding: '10px 20px', background: 'white', border: 'none', borderRight: '1px solid #ddd', color: 'var(--accent-green)', cursor: 'pointer', fontWeight: 'bold' }}>2</button>
-                  <button style={{ padding: '10px 20px', background: 'white', border: 'none', borderRight: '1px solid #ddd', color: 'var(--accent-green)', cursor: 'pointer', fontWeight: 'bold' }}>3</button>
-                  <button style={{ padding: '10px 20px', background: 'white', border: 'none', color: 'var(--accent-green)', cursor: 'pointer', fontWeight: '600' }}>Siguiente</button>
-                </div>
+                {totalPages > 1 && (
+                  <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                    <button 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      style={{ padding: '10px 20px', background: currentPage === 1 ? '#f5f5f5' : 'white', border: 'none', borderRight: '1px solid #ddd', color: currentPage === 1 ? '#aaa' : 'var(--accent-green)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                    >
+                      Anterior
+                    </button>
+                    
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button 
+                        key={i + 1}
+                        onClick={() => setCurrentPage(i + 1)}
+                        style={{ padding: '10px 20px', background: currentPage === i + 1 ? 'var(--accent-green)' : 'white', border: 'none', borderRight: '1px solid #ddd', color: currentPage === i + 1 ? 'white' : 'var(--accent-green)', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+
+                    <button 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      style={{ padding: '10px 20px', background: currentPage === totalPages ? '#f5f5f5' : 'white', border: 'none', color: currentPage === totalPages ? '#aaa' : 'var(--accent-green)', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                    >
+                      Siguiente
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

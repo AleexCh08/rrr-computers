@@ -5,6 +5,28 @@ import { useNavigate } from 'react-router-dom';
 export default function ProductCard({ id, image, price, title, description }) {
   const navigate = useNavigate();
 
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!localStorage.getItem('access_token')) {
+      alert("Debes iniciar sesión para añadir productos al carrito.");
+      window.location.href = '/login';
+      return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const safeId = id || title;
+    const existingItemIndex = cart.findIndex(item => item.id === id);
+    
+    if (existingItemIndex >= 0) {
+      cart[existingItemIndex].quantity += 1;
+    } else {
+      cart.push({ id: safeId, name: title, price: parseFloat(price), quantity: 1, image });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(`¡${title} añadido al carrito!`);
+  };
+
   return (
     <motion.div 
       onClick={() => navigate(`/producto/${id || 1}`)}
@@ -60,7 +82,7 @@ export default function ProductCard({ id, image, price, title, description }) {
           <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-dark)', margin: 0 }}>${price}</h3>
           
           <motion.button 
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => handleAddToCart(e)}
             whileHover={{ scale: 1.02, backgroundColor: 'var(--accent-green-hover)' }}
             whileTap={{ scale: 0.95 }}
             style={{ 
