@@ -41,6 +41,29 @@ export default function ComponentForm({ initialData = null, isEdit = false }) {
     }
   };
 
+  const getDynamicPlaceholder = () => {
+    if (formData.category === 'PC') {
+      return "Ejemplo de especificaciones:\n- Procesador: \n- Memoria RAM: \n- Almacenamiento: \n- Tarjeta Madre: \n- Fuente de Poder: \n- Torre/Chasis: \n- Sistema Operativo: \n- Detalles extra: ";
+    }
+    
+    switch (formData.type) {
+      case 'Procesador':
+        return "Ejemplo:\n- Núcleos / Hilos: \n- Frecuencia Base/Turbo: \n- Gráficos integrados (Sí/No): \n- Socket: ";
+      case 'Ram':
+        return "Ejemplo:\n- Capacidad: \n- Tipo (DDR4/DDR5): \n- Frecuencia (MHz): \n- Latencia (CL): ";
+      case 'Tarjeta Gráfica':
+        return "Ejemplo:\n- VRAM (GB y Tipo): \n- Puertos (HDMI/DP): \n- Alimentación requerida (Pines/Watts): ";
+      case 'Tarjeta Madre':
+        return "Ejemplo:\n- Socket: \n- Formato (ATX/Micro-ATX): \n- Slots de RAM máximo: \n- Conexiones (M.2, SATA): ";
+      case 'PSU':
+        return "Ejemplo:\n- Potencia (W): \n- Certificación (80 Plus...): \n- Modular / No Modular: ";
+      case 'STORAGE':
+        return "Ejemplo:\n- Tipo (SSD NVMe / SSD SATA / HDD): \n- Capacidad: \n- Velocidad de lectura/escritura: ";
+      default:
+        return "Indica las especificaciones técnicas aquí...";
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
@@ -115,7 +138,14 @@ export default function ComponentForm({ initialData = null, isEdit = false }) {
 
       <div>
         <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Descripción / Detalles Técnicos</label>
-        <textarea name="description" value={formData.description} onChange={handleChange} rows="4" className="form-textarea" placeholder="Indica las especificaciones técnicas aquí..."></textarea>
+        <textarea 
+          name="description" 
+          value={formData.description} 
+          onChange={handleChange} 
+          rows="8" 
+          className="form-textarea" 
+          placeholder={getDynamicPlaceholder()}
+        ></textarea>
       </div>
 
       <div style={{ display: 'flex', gap: '15px', marginTop: '20px', justifyContent: 'flex-end' }}>
