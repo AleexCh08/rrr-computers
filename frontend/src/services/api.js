@@ -21,20 +21,43 @@ api.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      console.warn("Token inválido o expirado. Limpiando credenciales y redirigiendo...");
-      
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+  async (error) => {
+    const originalRequest = error.config;
 
-      const currentPath = window.location.pathname;
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = localStorage.getItem('refresh_token');
 
-      if (currentPath.startsWith('/admin') && currentPath !== '/admin/login') {
-        window.location.href = '/admin/login';
-      } 
-      else if (!currentPath.startsWith('/admin') && currentPath !== '/login') {
-        window.location.href = '/login';
+      if (refreshToken) {
+        try {
+          const res = await axios.post(`http://${window.location.hostname}:8000/api/token/refresh/`, {
+            refresh: refreshToken
+          });
+
+          localStorage.setItem('access_token', res.data.access);
+          originalRequest.headers['Authorization'] = `Bearer ${res.data.access}`;
+          return api(originalRequest);
+          
+        } catch (refreshError) {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          const currentPath = window.location.pathname;
+          
+          if (currentPath.startsWith('/admin') && currentPath !== '/admin/login') {
+            window.location.href = '/admin/login';
+          } else if (!currentPath.startsWith('/admin') && currentPath !== '/login') {
+            window.location.href = '/login';
+          }
+          return Promise.reject(refreshError);
+        }
+      } else {
+        localStorage.removeItem('access_token');
+        const currentPath = window.location.pathname;
+        if (currentPath.startsWith('/admin') && currentPath !== '/admin/login') {
+          window.location.href = '/admin/login';
+        } else if (!currentPath.startsWith('/admin') && currentPath !== '/login') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

@@ -26,43 +26,49 @@ import AdminReturns from './pages/admin/AdminReturns.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
 import AdminMessages from './pages/admin/AdminMessages.jsx';
 
-function TokenWatcher() {
+function IdleWatcher() {
   const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
 
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const expireTime = payload.exp * 1000; 
-      const timeRemaining = expireTime - Date.now(); 
+    let idleTimer;
 
-      if (timeRemaining <= 0) {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        window.location.href = location.pathname.startsWith('/admin') ? '/admin/login' : '/login';
-      } else {
-        const timer = setTimeout(() => {
-          alert("Tu sesión ha expirado por seguridad. Serás redirigido.");
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          window.location.href = location.pathname.startsWith('/admin') ? '/admin/login' : '/login';
-        }, timeRemaining);
-        return () => clearTimeout(timer); 
-      }
-    } catch (error) {
-      console.error("Error al leer el token de seguridad", error);
-    }
-  }, [location.pathname]); 
+    const logoutUser = () => {
+      alert("Tu sesión ha expirado por 5 minutos de inactividad. Serás redirigido.");
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      window.location.href = location.pathname.startsWith('/admin') ? '/admin/login' : '/login';
+    };
 
-  return null; 
+    const resetTimer = () => {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(logoutUser, 5 * 60 * 1000);
+    };
+
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keypress', resetTimer);
+    window.addEventListener('click', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+
+    resetTimer();
+    return () => {
+      clearTimeout(idleTimer);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keypress', resetTimer);
+      window.removeEventListener('click', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+    };
+  }, [location.pathname]);
+
+  return null;
 }
 
 function App() {
   return (
     <Router>
-      <TokenWatcher />
+      <IdleWatcher />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/donar" element={<Donations />} />
