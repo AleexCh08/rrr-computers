@@ -1,19 +1,28 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from '../ui/ProductCard';
 import ProductCarousel from '../ui/ProductCarousel';
 import { Link } from 'react-router-dom';
+import api from '../../services/api';
 
 import imgFuente from '../../assets/fuente.png';
-import imgTeclado from '../../assets/teclado.png';
-
-const partsData = [
-  { id: 1,image: imgFuente, price: "5", title: "Fuente", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { id: 2, image: imgTeclado, price: "15", title: "Teclado", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { id: 3, image: imgFuente, price: "80", title: "Fuente", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { id: 4, image: imgTeclado, price: "10", title: "Teclado", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." }
-];
 
 export default function PartsSection() {
+  const [components, setComponents] = useState([]);
+
+  useEffect(() => {
+    const fetchComponents = async () => {
+      try {
+        const response = await api.get('inventario/componentes/');
+        const availableParts = response.data.filter(item => item.category === 'Componente' && item.stock > 0);
+        setComponents(availableParts);
+      } catch (error) {
+        console.error("Error al cargar los componentes para el Home:", error);
+      }
+    };
+    fetchComponents();
+  }, []);
+
   return (
     <motion.section 
       initial={{ opacity: 0, y: 50 }}
@@ -31,16 +40,22 @@ export default function PartsSection() {
         
         <div style={{ marginBottom: '40px' }}>
           <ProductCarousel>
-            {partsData.map((part) => (
-              <ProductCard 
-                key={part.id}
-                id={part.id} 
-                image={part.image} 
-                price={part.price}
-                title={part.title} 
-                description={part.description} 
-              />
-            ))}
+            {components.length === 0 ? (
+              <div style={{ width: '100%', textAlign: 'center', padding: '40px', color: '#666' }}>
+                <p>Cargando piezas disponibles...</p>
+              </div>
+            ) : (
+              components.map((part) => (
+                <ProductCard 
+                  key={part.id}
+                  id={part.id} 
+                  image={imgFuente} 
+                  price={part.price}
+                  title={part.name} 
+                  description={part.description || 'Sin descripción detallada.'} 
+                />
+              ))
+            )}
           </ProductCarousel>
         </div>
         

@@ -50,7 +50,7 @@ export default function ProductCarousel({ children }) {
           gap: '20px', 
           overflowX: 'auto', 
           scrollBehavior: 'smooth', 
-          paddingBottom: '10px',
+          padding: '10px 40px', 
           width: '100%'
         }}
       >
