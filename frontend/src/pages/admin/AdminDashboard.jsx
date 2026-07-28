@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiDollarSign, FiShoppingBag, FiInbox, FiAlertTriangle, FiArrowUpRight, FiClock } from 'react-icons/fi';
+import { FiDollarSign, FiShoppingBag, FiInbox, FiAlertTriangle, FiArrowUpRight, FiClock, FiMail } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import api from '../../services/api';
 
@@ -7,6 +7,7 @@ export default function AdminDashboard() {
   const [pendingDonations, setPendingDonations] = useState(0);
   const [stockAlerts, setStockAlerts] = useState(0);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [totalMessages, setTotalMessages] = useState(0);
 
   useEffect(() => {
     const fetchDashboardMetrics = async () => {
@@ -21,6 +22,9 @@ export default function AdminDashboard() {
 
         const returnsRes = await api.get('ordenes/devoluciones/');
         const usersRes = await api.get('usuarios/admin-users/');
+        const messagesRes = await api.get('usuarios/admin-mensajes/');
+        const unreadCount = messagesRes.data.filter(m => !m.is_read).length;
+        setTotalMessages(unreadCount);
 
         const formattedDonations = donationsRes.data.map(d => ({
           id: `don-${d.id}`,
@@ -43,7 +47,14 @@ export default function AdminDashboard() {
           timestamp: new Date(u.date_joined).getTime()
         }));
 
-        const combinedActivity = [...formattedDonations, ...formattedReturns, ...formattedUsers]
+        const formattedMessages = messagesRes.data.map(m => ({
+          id: `msg-${m.id}`,
+          text: `Nuevo mensaje de ${m.name}`,
+          time: m.created_at.split('T')[0],
+          timestamp: new Date(m.created_at).getTime()
+        }));
+
+        const combinedActivity = [...formattedDonations, ...formattedReturns, ...formattedUsers, ...formattedMessages]
           .sort((a, b) => b.timestamp - a.timestamp)
           .slice(0, 4);
 
@@ -123,6 +134,17 @@ export default function AdminDashboard() {
             <div>
               <p style={{ margin: 0, color: '#666', fontSize: '0.95rem', fontWeight: '600' }}>Alertas de Stock</p>
               <h3 style={{ margin: '5px 0 0 0', fontSize: '1.8rem', color: 'var(--text-dark)' }}>{stockAlerts}</h3>
+            </div>
+          </div>
+
+          {/* Tarjeta 5 */}
+          <div style={{ background: 'white', padding: '25px', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #eaeaea', display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ backgroundColor: '#e2d9f3', padding: '15px', borderRadius: '50%', color: '#4a148c', display: 'flex' }}>
+              <FiMail size={28} />
+            </div>
+            <div>
+              <p style={{ margin: 0, color: '#666', fontSize: '0.95rem', fontWeight: '600' }}>Mensajes Sin Leer</p>
+              <h3 style={{ margin: '5px 0 0 0', fontSize: '1.8rem', color: 'var(--text-dark)' }}>{totalMessages}</h3>
             </div>
           </div>
 
