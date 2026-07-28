@@ -7,9 +7,15 @@ import api from '../services/api';
 export default function MyAccount() {
   const [activeTab, setActiveTab] = useState('orders');
 
+  const [alertMessage, setAlertMessage] = useState(null);
   const [user, setUser] = useState({ name: '', email: '', phone: 'No registrado', address: 'No registrada' });
   const [myOrders, setMyOrders] = useState([]);
   const [myDonations, setMyDonations] = useState([]);
+
+  const triggerAlert = (message) => {
+    setAlertMessage(message);
+    setTimeout(() => setAlertMessage(null), 3000);
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,10 +51,25 @@ export default function MyAccount() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Procesando': return '#f57f17'; // Naranja
+      case 'Procesando': return '#f57f17'; 
       case 'Pendiente': return '#f57f17'; 
-      case 'Entregado': return '#2e7d32'; // Verde
+      case 'Entregado': return '#2e7d32'; 
       default: return '#555';
+    }
+  };
+
+  const handleSaveChanges = async (e) => {
+    e.preventDefault();
+    try {
+      await api.patch('usuarios/perfil/', {
+        first_name: user.name,
+        phone: user.phone,
+        address: user.address
+      });
+      triggerAlert('¡Cambios guardados con éxito!');
+    } catch (error) {
+      console.error("Error al actualizar el perfil:", error);
+      triggerAlert('Error al intentar guardar los cambios.');
     }
   };
 
@@ -157,31 +178,40 @@ export default function MyAccount() {
             {activeTab === 'settings' && (
               <div>
                 <h2 style={{ fontSize: '1.5rem', color: 'var(--text-dark)', marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #eee' }}>Ajustes de Perfil</h2>
-                <form style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
+                
+                {/* NUEVO: Mensaje de confirmación visual */}
+                {alertMessage && (
+                  <div style={{ backgroundColor: '#d4edda', color: '#155724', padding: '12px 20px', borderRadius: '4px', marginBottom: '20px', fontWeight: '600', borderLeft: '4px solid #28a745' }}>
+                    {alertMessage}
+                  </div>
+                )}
+
+                {/* ACTUALIZADO: onSubmit y conexión de los inputs con el estado 'user' */}
+                <form onSubmit={handleSaveChanges} style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                     <div>
                       <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>Nombre Completo</label>
-                      <input type="text" defaultValue={user.name} className="form-input" />
+                      <input type="text" value={user.name} onChange={(e) => setUser({...user, name: e.target.value})} className="form-input" />
                     </div>
                     <div>
                       <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>Teléfono</label>
-                      <input type="text" defaultValue={user.phone} className="form-input" />
+                      <input type="text" value={user.phone} onChange={(e) => setUser({...user, phone: e.target.value})} className="form-input" placeholder="Ej. 0414-1234567" />
                     </div>
                   </div>
 
                   <div>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>Correo Electrónico</label>
-                    <input type="email" defaultValue={user.email} className="form-input" disabled style={{ backgroundColor: '#f5f5f5', color: '#888' }} />
-                    <small style={{ color: '#888', marginTop: '5px', display: 'block' }}>El correo no se puede cambiar.</small>
+                    <input type="email" value={user.email} className="form-input" disabled style={{ backgroundColor: '#f5f5f5', color: '#888' }} />
+                    <small style={{ color: '#888', marginTop: '5px', display: 'block' }}>El correo no se puede cambiar por seguridad.</small>
                   </div>
 
                   <div>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>Dirección de Envío Principal</label>
-                    <textarea defaultValue={user.address} className="form-textarea" rows="3"></textarea>
+                    <textarea value={user.address} onChange={(e) => setUser({...user, address: e.target.value})} className="form-textarea" rows="3" placeholder="Indica tu dirección completa..."></textarea>
                   </div>
 
-                  <button type="button" className="btn-primary" style={{ padding: '12px 25px', backgroundColor: '#4CAF50', alignSelf: 'flex-start' }}>
+                  <button type="submit" className="btn-primary" style={{ padding: '12px 25px', backgroundColor: '#4CAF50', alignSelf: 'flex-start' }}>
                     Guardar Cambios
                   </button>
                 </form>

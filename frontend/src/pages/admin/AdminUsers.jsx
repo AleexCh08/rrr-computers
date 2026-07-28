@@ -207,16 +207,16 @@ export default function AdminUsers() {
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Teléfono</label>
-              <input type="text" defaultValue="No registrado" className="form-input" disabled style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }} />
+              <input type="text" value={selectedUser.phone || "No registrado"} className="form-input" disabled style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }} />
             </div>
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>Dirección de Envío Principal</label>
-              <textarea defaultValue="No registrada" className="form-textarea" rows="3" disabled style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }}></textarea>
+              <textarea value={selectedUser.address || "No registrada"} className="form-textarea" rows="3" disabled style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }}></textarea>
             </div>
 
-            <div style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '10px', borderRadius: '4px', fontSize: '0.85rem', marginTop: '5px', marginBottom: '10px', textAlign: 'center' }}>
-              <strong>Nota:</strong> Teléfono y Dirección están bloqueados.
+            <div style={{ backgroundColor: '#e2e8f0', color: '#475569', padding: '10px', borderRadius: '4px', fontSize: '0.85rem', marginTop: '5px', marginBottom: '10px', textAlign: 'center' }}>
+              <strong>Nota:</strong> Los datos personales del usuario son de solo lectura.
             </div>
           </form>
         )}
