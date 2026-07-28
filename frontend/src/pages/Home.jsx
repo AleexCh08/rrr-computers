@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { MdRecycling } from 'react-icons/md';
@@ -7,17 +8,26 @@ import PartsSection from '../components/home/PartsSection';
 import CollaborateSection from '../components/home/CollaborateSection';
 import ProductCard from '../components/ui/ProductCard';
 import ProductCarousel from '../components/ui/ProductCarousel';
+import api from '../services/api';
 
 import imgPc from '../assets/foto-pc.png';
 
-const catalogData = [
-  { id: 1, image: imgPc, price: "89", title: "Computadora 1", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { id: 2, image: imgPc, price: "89", title: "Computadora 2", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { id: 3, image: imgPc, price: "89", title: "Computadora 3", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { id: 4, image: imgPc, price: "89", title: "Computadora 4", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." }
-];
-
 export default function Home() {
+  const [pcs, setPcs] = useState([]);
+
+  useEffect(() => {
+    const fetchPCs = async () => {
+      try {
+        const response = await api.get('inventario/componentes/');
+        const availablePCs = response.data.filter(item => item.category === 'PC' && item.stock > 0);
+        setPcs(availablePCs);
+      } catch (error) {
+        console.error("Error al cargar las PCs para el Home:", error);
+      }
+    };
+    fetchPCs();
+  }, []);
+
   return (
     <div className="home-page">
       <Navbar />
@@ -69,16 +79,22 @@ export default function Home() {
           </div>
           <div style={{ width: '75%' }}>
              <ProductCarousel>
-               {catalogData.map((product) => (
-                 <ProductCard 
-                   key={product.id}
-                   id={product.id} 
-                   image={product.image} 
-                   price={product.price} 
-                   title={product.title} 
-                   description={product.description} 
-                 />
-               ))}
+               {pcs.length === 0 ? (
+                 <div style={{ width: '100%', textAlign: 'center', padding: '40px', color: '#666' }}>
+                   <p>Cargando equipos disponibles...</p>
+                 </div>
+               ) : (
+                 pcs.map((product) => (
+                   <ProductCard 
+                     key={product.id}
+                     id={product.id} 
+                     image={imgPc} 
+                     price={product.price} 
+                     title={product.name} 
+                     description={product.description || 'Sin descripción detallada.'} 
+                   />
+                 ))
+               )}
              </ProductCarousel>
           </div>
         </div>
