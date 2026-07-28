@@ -12,13 +12,26 @@ import imgPc from '../assets/foto-pc.png';
 export default function Catalog() {
   const [components, setComponents] = useState([]);
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [category, setCategory] = useState('Todos');
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(5000);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; 
 
+  const filteredComponents = components.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = category === 'Todos' || item.type === category;
+    const matchesPrice = item.price >= minPrice && item.price <= maxPrice;
+    
+    return matchesSearch && matchesCategory && matchesPrice;
+  });
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = components.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(components.length / itemsPerPage);
+  const currentItems = filteredComponents.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
 
   useEffect(() => {
     const fetchComponents = async () => {
@@ -51,14 +64,31 @@ export default function Catalog() {
             </div>
             
             <div style={{ display: 'flex', gap: '10px' }}>
-              <input type="text" placeholder="Nombre" className="form-input" style={{ width: '250px' }} />
-              <button className="btn-primary" style={{ padding: '10px 25px' }}>Buscar</button>
+              <input 
+                type="text" 
+                placeholder="Buscar equipo o pieza..." 
+                className="form-input" 
+                style={{ width: '280px' }}
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // Regresamos a la pag 1 al teclear
+                }}
+              />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '40px' }}>
             
-            <SidebarFilters />
+            <SidebarFilters 
+              category={category}
+              setCategory={setCategory}
+              minPrice={minPrice}
+              setMinPrice={setMinPrice}
+              maxPrice={maxPrice}
+              setMaxPrice={setMaxPrice}
+              setCurrentPage={setCurrentPage}
+            />
 
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '50px' }}>

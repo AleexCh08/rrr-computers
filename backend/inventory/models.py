@@ -1,7 +1,6 @@
 from django.db import models
 
 class Component(models.Model):
-    # Opciones para el selector de tipo/categoría
     CATEGORY_CHOICES = [
         ('CPU', 'Procesador (CPU)'),
         ('RAM', 'Memoria RAM'),
@@ -11,7 +10,6 @@ class Component(models.Model):
         ('STORAGE', 'Almacenamiento'),
     ]
 
-    # Opciones para el estado del componente
     CONDITION_CHOICES = [
         ('nuevo', 'Nuevo'),
         ('usado_bueno', 'Usado (Buen Estado)'),
