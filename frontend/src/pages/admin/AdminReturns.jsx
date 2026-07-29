@@ -144,7 +144,7 @@ export default function AdminReturns() {
             <p><strong>Cliente:</strong> {selectedReturn.client_name}</p>
             <p><strong>Fecha:</strong> {selectedReturn.created_at.split('T')[0]}</p>
             <p><strong>Componente:</strong> {selectedReturn.item_name}</p>
-            <div style={{ marginTop: '15px', backgroundColor: '#fdfdfd', padding: '15px', borderRadius: '5px', border: '1px solid #ddd' }}>
+            <div style={{ marginTop: '15px', marginBottom: '15px', backgroundColor: '#fdfdfd', padding: '15px', borderRadius: '5px', border: '1px solid #ddd' }}>
               <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#d9534f' }}>Motivo de devolución:</p>
               <p style={{ fontSize: '0.95rem' }}>{selectedReturn.reason}</p>
             </div>

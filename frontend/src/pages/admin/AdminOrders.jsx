@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
 import { FiSearch, FiEye, FiEdit, FiXCircle } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
+import Modal from '../../components/ui/Modal'; // NUEVO: Importamos el Modal
 import api from '../../services/api';
 
 export default function AdminOrders() {
   const [alertMessage, setAlertMessage] = useState(null);
   const [orders, setOrders] = useState([]);
+  
+  // NUEVO: Estados para manejar las ventanas flotantes y la orden seleccionada
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [newStatus, setNewStatus] = useState('');
 
   const triggerAlert = (message) => {
     setAlertMessage(message);
@@ -25,6 +32,25 @@ export default function AdminOrders() {
     };
     fetchAllOrders();
   }, []);
+
+  // NUEVO: Función maestra que envía la actualización a Django
+  const handleStatusChange = async (id, statusToUpdate) => {
+    try {
+      // Hacemos un PATCH enviando solo el nuevo estado
+      await api.patch(`ordenes/${id}/`, { status: statusToUpdate });
+      
+      // Actualizamos la tabla de React instantáneamente sin recargar la página
+      setOrders(orders.map(order => 
+        order.id === id ? { ...order, status: statusToUpdate } : order
+      ));
+      
+      triggerAlert(`Orden #${id} actualizada exitosamente a: ${statusToUpdate}`);
+      setShowStatusModal(false); // Cerramos el modal si estaba abierto
+    } catch (error) {
+      console.error("Error al actualizar la orden:", error);
+      triggerAlert("Error de conexión. No se pudo actualizar el estado.");
+    }
+  };
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -109,9 +135,7 @@ export default function AdminOrders() {
                       }}
                     >
                       <div style={{ fontWeight: '700', color: 'var(--text-dark)' }}>#{order.id}</div>
-                      {/* ACTUALIZADO: Parseo de la fecha real de la BD */}
                       <div style={{ color: '#666', fontSize: '0.9rem' }}>{new Date(order.created_at).toLocaleDateString()}</div>
-                      {/* ACTUALIZADO: Uso de client_name del modelo de Django */}
                       <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '500', color: '#333' }}>{order.client_name}</div>
                       <div style={{ fontWeight: '600', color: 'var(--text-dark)' }}>${order.total}</div>
                       
@@ -129,13 +153,36 @@ export default function AdminOrders() {
                       </div>
                       
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                        <button onClick={() => triggerAlert(`Visualizando detalles de la orden #${order.id}`)} title="Ver Detalles" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
+                        {/* Botón Ver Detalles */}
+                        <button 
+                          onClick={() => { setSelectedOrder(order); setShowViewModal(true); }} 
+                          title="Ver Detalles" 
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}
+                        >
                           <FiEye size={20} />
                         </button>
-                        <button onClick={() => triggerAlert(`Actualizando estado de la orden #${order.id}`)} title="Cambiar Estado" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4CAF50' }}>
+                        
+                        {/* Botón Cambiar Estado */}
+                        <button 
+                          onClick={() => { setSelectedOrder(order); setNewStatus(order.status); setShowStatusModal(true); }} 
+                          title="Cambiar Estado" 
+                          disabled={order.status === 'Cancelado'} // Opcional: no editar si está cancelado
+                          style={{ background: 'none', border: 'none', cursor: order.status === 'Cancelado' ? 'not-allowed' : 'pointer', color: '#4CAF50', opacity: order.status === 'Cancelado' ? 0.4 : 1 }}
+                        >
                           <FiEdit size={20} />
                         </button>
-                        <button onClick={() => triggerAlert(`Orden #${order.id} cancelada`)} title="Cancelar Orden" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
+
+                        {/* Botón Cancelar (Con confirmación nativa) */}
+                        <button 
+                          onClick={() => { 
+                            if (window.confirm(`¿Estás seguro de que deseas cancelar la Orden #${order.id}?`)) {
+                              handleStatusChange(order.id, 'Cancelado');
+                            }
+                          }} 
+                          title="Cancelar Orden" 
+                          disabled={order.status === 'Cancelado' || order.status === 'Entregado'}
+                          style={{ background: 'none', border: 'none', cursor: (order.status === 'Cancelado' || order.status === 'Entregado') ? 'not-allowed' : 'pointer', color: '#d9534f', opacity: (order.status === 'Cancelado' || order.status === 'Entregado') ? 0.4 : 1 }}
+                        >
                           <FiXCircle size={20} />
                         </button>
                       </div>
@@ -145,9 +192,98 @@ export default function AdminOrders() {
               )}
             </div>
           </div>
-
         </div>
       </main>
+
+      {/* MODAL 1: Ver Detalles */}
+      <Modal isOpen={showViewModal} onClose={() => setShowViewModal(false)} title={`Detalles de la Orden #${selectedOrder?.id}`}>
+        {selectedOrder && (
+          <div style={{ textAlign: 'left', color: '#333', fontSize: '1.05rem', lineHeight: '1.6' }}>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+              <div>
+                <p style={{ margin: '0 0 5px 0' }}><strong>Cliente:</strong> {selectedOrder.client_name}</p>
+                <p style={{ margin: 0 }}><strong>Fecha:</strong> {new Date(selectedOrder.created_at).toLocaleString()}</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ 
+                  backgroundColor: getStatusStyle(selectedOrder.status).bg, 
+                  color: getStatusStyle(selectedOrder.status).color, 
+                  padding: '6px 15px', borderRadius: '20px', fontSize: '0.9rem', fontWeight: '700',
+                  display: 'inline-block'
+                }}>
+                  {selectedOrder.status}
+                </span>
+              </div>
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
+            
+            <h4 style={{ margin: '0 0 15px 0', color: 'var(--text-dark)', fontSize: '1.1rem' }}>Artículos Comprados:</h4>
+            
+            {/* Contenedor de los productos tipo factura */}
+            <div style={{ backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '8px', border: '1px solid #eaeaea', maxHeight: '250px', overflowY: 'auto', marginBottom: '20px' }}>
+              {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {selectedOrder.items.map((item, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: idx !== selectedOrder.items.length - 1 ? '1px solid #eee' : 'none', paddingBottom: idx !== selectedOrder.items.length - 1 ? '10px' : '0' }}>
+                      <div style={{ color: '#444' }}>
+                        <strong style={{ color: 'var(--text-dark)' }}>{item.quantity}x</strong> {item.product_name}
+                      </div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-dark)' }}>
+                        ${parseFloat(item.price * item.quantity).toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ margin: 0, color: '#888', fontStyle: 'italic', textAlign: 'center' }}>
+                  No se encontraron detalles de piezas para esta orden.
+                </p>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.3rem', fontWeight: '800', color: 'var(--text-dark)', marginBottom: '15px' }}>
+              <span>Total a Pagar:</span>
+              <span>${selectedOrder.total}</span>
+            </div>
+            
+          </div>
+        )}
+      </Modal>
+
+      {/* MODAL 2: Cambiar Estado */}
+      <Modal isOpen={showStatusModal} onClose={() => setShowStatusModal(false)} title={`Cambiar Estado - Orden #${selectedOrder?.id}`}>
+        {selectedOrder && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', color: '#333', marginBottom: '8px' }}>
+                Nuevo Estado Logístico:
+              </label>
+              <select 
+                value={newStatus} 
+                onChange={(e) => setNewStatus(e.target.value)}
+                style={{ width: '100%', padding: '12px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '1rem', backgroundColor: '#fff' }}
+              >
+                <option value="Procesando">Procesando (Pago recibido)</option>
+                <option value="Ensamblando">Ensamblando (Preparando equipos)</option>
+                <option value="Enviado">Enviado (En camino al cliente)</option>
+                <option value="Entregado">Entregado (Finalizado)</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+            </div>
+            
+            <button 
+              onClick={() => handleStatusChange(selectedOrder.id, newStatus)}
+              className="btn-primary"
+              style={{ width: '50%', padding: '12px', backgroundColor: '#5A7D9A', fontSize: '1.05rem', display: 'flex', justifyContent: 'center', margin: '0 auto 15px auto' }}
+            >
+              Guardar Cambios
+            </button>
+          </div>
+        )}
+      </Modal>
+
     </div>
   );
 }

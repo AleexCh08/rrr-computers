@@ -11,7 +11,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = ['component_id', 'product_name', 'price', 'quantity']
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True, write_only=True)
+    items = OrderItemSerializer(many=True, required=False)
 
     class Meta:
         model = Order
@@ -19,7 +19,7 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ['status', 'created_at']
 
     def create(self, validated_data):
-        items_data = validated_data.pop('items')
+        items_data = validated_data.pop('items', [])
         
         user = self.context['request'].user 
         with transaction.atomic():
@@ -27,8 +27,9 @@ class OrderSerializer(serializers.ModelSerializer):
             
             for item_data in items_data:
                 component_id = item_data.pop('component_id')
+                
                 try:
-                    component = Component.objects.select_for_update().get(id=component_id)
+                    component = Component.objects.select_for_update().get(id=component_id) 
                 except Component.DoesNotExist:
                     raise serializers.ValidationError(f"El producto con ID {component_id} ya no existe.")
                 
@@ -37,6 +38,7 @@ class OrderSerializer(serializers.ModelSerializer):
                 
                 component.stock -= item_data['quantity']
                 component.save()
+                
                 OrderItem.objects.create(order=order, component=component, **item_data)
             
         return order

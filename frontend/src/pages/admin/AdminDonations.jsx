@@ -204,7 +204,7 @@ export default function AdminDonations() {
               <p><strong>Condición Declarada:</strong> {selectedDonation.condition}</p>
               <p><strong>Fecha de Solicitud:</strong> {selectedDonation.created_at.split('T')[0]}</p>
               
-              <div style={{ marginTop: '15px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}>
+              <div style={{ marginTop: '15px', marginBottom: '15px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}>
                 <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>Descripción y Notas:</p>
                 <p style={{ fontSize: '0.95rem' }}>{selectedDonation.description || 'Sin comentarios adicionales.'}</p>
               </div>
