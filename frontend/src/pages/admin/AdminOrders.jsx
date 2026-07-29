@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiSearch, FiEye, FiEdit, FiXCircle } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
+import api from '../../services/api';
 
 export default function AdminOrders() {
-  // Estado para la alerta visual
   const [alertMessage, setAlertMessage] = useState(null);
+  const [orders, setOrders] = useState([]);
 
   const triggerAlert = (message) => {
     setAlertMessage(message);
@@ -13,23 +14,25 @@ export default function AdminOrders() {
     }, 3000);
   };
 
-  // Datos simulados de órdenes
-  const [orders, setOrders] = useState([
-    { id: '1026', date: '2026-07-25', client: 'Carlos Pérez', total: 450, status: 'Procesando' },
-    { id: '1025', date: '2026-07-24', client: 'Ana Gómez', total: 120, status: 'Ensamblando' },
-    { id: '1024', date: '2026-07-22', client: 'Luis Silva', total: 85, status: 'Enviado' },
-    { id: '1023', date: '2026-07-20', client: 'María López', total: 210, status: 'Entregado' },
-    { id: '1022', date: '2026-07-19', client: 'Javier Roca', total: 60, status: 'Cancelado' },
-  ]);
+  useEffect(() => {
+    const fetchAllOrders = async () => {
+      try {
+        const response = await api.get('ordenes/');
+        setOrders(response.data);
+      } catch (error) {
+        console.error("Error al cargar las órdenes del sistema:", error);
+      }
+    };
+    fetchAllOrders();
+  }, []);
 
-  // Función para determinar el color del badge según el estado logístico
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'Procesando': return { bg: '#fff3cd', color: '#856404' }; // Amarillo
-      case 'Ensamblando': return { bg: '#cce5ff', color: '#004085' }; // Azul
-      case 'Enviado': return { bg: '#e2d9f3', color: '#4a148c' }; // Morado
-      case 'Entregado': return { bg: '#d4edda', color: '#155724' }; // Verde
-      case 'Cancelado': return { bg: '#f8d7da', color: '#721c24' }; // Rojo
+      case 'Procesando': return { bg: '#fff3cd', color: '#856404' }; 
+      case 'Ensamblando': return { bg: '#cce5ff', color: '#004085' }; 
+      case 'Enviado': return { bg: '#e2d9f3', color: '#4a148c' }; 
+      case 'Entregado': return { bg: '#d4edda', color: '#155724' }; 
+      case 'Cancelado': return { bg: '#f8d7da', color: '#721c24' }; 
       default: return { bg: '#e2e8f0', color: '#475569' };
     }
   };
@@ -59,7 +62,6 @@ export default function AdminOrders() {
             </div>
           </div>
 
-          {/* Alerta Visual */}
           {alertMessage && (
             <div style={{ 
               backgroundColor: '#ebebeb', 
@@ -76,9 +78,7 @@ export default function AdminOrders() {
             </div>
           )}
 
-          {/* Tabla de Datos */}
           <div style={{ border: '1px solid #eaeaea', borderRadius: '8px', overflow: 'hidden' }}>
-            {/* Encabezado */}
             <div style={{ display: 'grid', gridTemplateColumns: '80px 120px 2fr 1fr 150px 150px', backgroundColor: '#5A7D9A', color: 'white', fontWeight: '600', padding: '15px', textAlign: 'center' }}>
               <div>ID</div>
               <div>Fecha</div>
@@ -88,58 +88,61 @@ export default function AdminOrders() {
               <div>Acciones</div>
             </div>
 
-            {/* Filas */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {orders.map((order, index) => {
-                const statusStyle = getStatusStyle(order.status);
-                
-                return (
-                  <div 
-                    key={order.id} 
-                    style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: '80px 120px 2fr 1fr 150px 150px', 
-                      backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white', 
-                      padding: '12px 15px', 
-                      textAlign: 'center', 
-                      alignItems: 'center',
-                      borderBottom: '1px solid #eaeaea'
-                    }}
-                  >
-                    <div style={{ fontWeight: '700', color: 'var(--text-dark)' }}>#{order.id}</div>
-                    <div style={{ color: '#666', fontSize: '0.9rem' }}>{order.date}</div>
-                    <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '500', color: '#333' }}>{order.client}</div>
-                    <div style={{ fontWeight: '600', color: 'var(--text-dark)' }}>${order.total}</div>
-                    
-                    {/* Badge de Estado */}
-                    <div>
-                      <span style={{ 
-                        backgroundColor: statusStyle.bg, 
-                        color: statusStyle.color, 
-                        padding: '5px 12px', 
-                        borderRadius: '20px', 
-                        fontSize: '0.85rem', 
-                        fontWeight: '700' 
-                      }}>
-                        {order.status}
-                      </span>
+              {orders.length === 0 ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>No hay órdenes registradas en el sistema.</div>
+              ) : (
+                orders.map((order, index) => {
+                  const statusStyle = getStatusStyle(order.status);
+                  
+                  return (
+                    <div 
+                      key={order.id} 
+                      style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: '80px 120px 2fr 1fr 150px 150px', 
+                        backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white', 
+                        padding: '12px 15px', 
+                        textAlign: 'center', 
+                        alignItems: 'center',
+                        borderBottom: '1px solid #eaeaea'
+                      }}
+                    >
+                      <div style={{ fontWeight: '700', color: 'var(--text-dark)' }}>#{order.id}</div>
+                      {/* ACTUALIZADO: Parseo de la fecha real de la BD */}
+                      <div style={{ color: '#666', fontSize: '0.9rem' }}>{new Date(order.created_at).toLocaleDateString()}</div>
+                      {/* ACTUALIZADO: Uso de client_name del modelo de Django */}
+                      <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '500', color: '#333' }}>{order.client_name}</div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-dark)' }}>${order.total}</div>
+                      
+                      <div>
+                        <span style={{ 
+                          backgroundColor: statusStyle.bg, 
+                          color: statusStyle.color, 
+                          padding: '5px 12px', 
+                          borderRadius: '20px', 
+                          fontSize: '0.85rem', 
+                          fontWeight: '700' 
+                        }}>
+                          {order.status}
+                        </span>
+                      </div>
+                      
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
+                        <button onClick={() => triggerAlert(`Visualizando detalles de la orden #${order.id}`)} title="Ver Detalles" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
+                          <FiEye size={20} />
+                        </button>
+                        <button onClick={() => triggerAlert(`Actualizando estado de la orden #${order.id}`)} title="Cambiar Estado" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4CAF50' }}>
+                          <FiEdit size={20} />
+                        </button>
+                        <button onClick={() => triggerAlert(`Orden #${order.id} cancelada`)} title="Cancelar Orden" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
+                          <FiXCircle size={20} />
+                        </button>
+                      </div>
                     </div>
-                    
-                    {/* Botones de Acción */}
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                      <button onClick={() => triggerAlert(`Visualizando detalles de la orden #${order.id}`)} title="Ver Detalles" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
-                        <FiEye size={20} />
-                      </button>
-                      <button onClick={() => triggerAlert(`Actualizando estado de la orden #${order.id}`)} title="Cambiar Estado" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4CAF50' }}>
-                        <FiEdit size={20} />
-                      </button>
-                      <button onClick={() => triggerAlert(`Orden #${order.id} cancelada`)} title="Cancelar Orden" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
-                        <FiXCircle size={20} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 

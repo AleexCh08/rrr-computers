@@ -30,8 +30,10 @@ export default function MyAccount() {
 
         const donacionesRes = await api.get('inventario/donaciones/mis_donaciones/');
         setMyDonations(donacionesRes.data);
+
+        const ordersRes = await api.get('ordenes/');
+        setMyOrders(ordersRes.data);
         
-        // Más adelante cargaremos myOrders y myDonations aquí
       } catch (error) {
         console.error("Error al cargar perfil:", error);
         if (error.response?.status === 401) {
@@ -138,7 +140,7 @@ export default function MyAccount() {
                   <div key={order.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', border: '1px solid #eaeaea', borderRadius: '6px', marginBottom: '15px' }}>
                     <div>
                       <h4 style={{ margin: '0 0 5px 0', color: 'var(--text-dark)', fontSize: '1.1rem' }}>Orden #{order.id}</h4>
-                      <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>Realizada el {order.date}</p>
+                      <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>Realizada el {new Date(order.created_at).toLocaleDateString()}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <h4 style={{ margin: '0 0 5px 0', color: 'var(--text-dark)', fontSize: '1.1rem' }}>${order.total}</h4>

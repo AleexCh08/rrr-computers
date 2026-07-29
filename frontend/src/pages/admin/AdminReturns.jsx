@@ -18,7 +18,7 @@ export default function AdminReturns() {
   useEffect(() => {
     const fetchReturns = async () => {
       try {
-        const response = await api.get('ordenes/devoluciones/');
+        const response = await api.get('devoluciones/');
         setReturns(response.data);
       } catch (error) {
         console.error("Error al cargar devoluciones:", error);
@@ -29,7 +29,7 @@ export default function AdminReturns() {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await api.patch(`ordenes/devoluciones/${id}/`, { status: newStatus });
+      await api.patch(`devoluciones/${id}/`, { status: newStatus });
       setReturns(returns.map(ret => 
         ret.id === id ? { ...ret, status: newStatus } : ret
       ));
