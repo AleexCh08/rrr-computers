@@ -12,30 +12,25 @@ export default function AdminDashboard() {
   const [activeOrders, setActiveOrders] = useState(0); 
   const [showActivityModal, setShowActivityModal] = useState(false);
   
-  // NUEVO: Estados dinámicos para el dinero y el gráfico
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [dynamicChart, setDynamicChart] = useState([]);
 
   useEffect(() => {
     const fetchDashboardMetrics = async () => {
-      // 1. Arquitectura a prueba de fallos: Variables independientes
       let fetchedDonations = [], fetchedInventory = [], fetchedReturns = [], fetchedOrders = [], fetchedUsers = [], fetchedMessages = [];
 
-      // Si una falla, las demás siguen funcionando
-      try { const res = await api.get('inventario/donaciones/'); fetchedDonations = res.data; } catch(e) { console.warn("Error donaciones"); }
-      try { const res = await api.get('inventario/componentes/'); fetchedInventory = res.data; } catch(e) { console.warn("Error inventario"); }
-      try { const res = await api.get('devoluciones/'); fetchedReturns = res.data; } catch(e) { console.warn("Error devoluciones"); }
-      try { const res = await api.get('ordenes/'); fetchedOrders = res.data; } catch(e) { console.warn("Error órdenes"); }
-      try { const res = await api.get('usuarios/admin-users/'); fetchedUsers = res.data; } catch(e) { console.warn("Error usuarios"); }
-      try { const res = await api.get('usuarios/admin-mensajes/'); fetchedMessages = res.data; } catch(e) { console.warn("Error mensajes"); }
+      try { const res = await api.get('inventario/donaciones/'); fetchedDonations = res.data.results; } catch(e) { console.warn("Error donaciones"); }
+      try { const res = await api.get('inventario/componentes/'); fetchedInventory = res.data.results; } catch(e) { console.warn("Error inventario"); }
+      try { const res = await api.get('devoluciones/'); fetchedReturns = res.data.results; } catch(e) { console.warn("Error devoluciones"); }
+      try { const res = await api.get('ordenes/'); fetchedOrders = res.data.results; } catch(e) { console.warn("Error órdenes"); }
+      try { const res = await api.get('usuarios/admin-users/'); fetchedUsers = res.data.results; } catch(e) { console.warn("Error usuarios"); }
+      try { const res = await api.get('usuarios/admin-mensajes/'); fetchedMessages = res.data.results; } catch(e) { console.warn("Error mensajes"); }
 
-      // 2. Asignación de KPIs básicos
       setPendingDonations(fetchedDonations.filter(d => d.status === 'Pendiente').length);
       setStockAlerts(fetchedInventory.filter(comp => comp.stock <= 5).length);
       setTotalMessages(fetchedMessages.filter(m => !m.is_read).length);
       setActiveOrders(fetchedOrders.filter(o => o.status !== 'Entregado' && o.status !== 'Cancelado').length);
 
-      // 3. NUEVO: Cálculo Dinámico de Ingresos del Mes Actual
       const now = new Date();
       const currentMonthOrders = fetchedOrders.filter(o => {
         const oDate = new Date(o.created_at);
@@ -44,17 +39,14 @@ export default function AdminDashboard() {
       const monthTotal = currentMonthOrders.reduce((acc, order) => acc + parseFloat(order.total), 0);
       setMonthlyIncome(monthTotal);
 
-      // 4. NUEVO: Lógica del Gráfico (Últimos 7 meses)
       const monthsLabel = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
       const chartData = [];
       
-      // Construimos el esqueleto de los últimos 7 meses hacia atrás
       for (let i = 6; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         chartData.push({ monthIndex: d.getMonth(), year: d.getFullYear(), label: monthsLabel[d.getMonth()], value: 0 });
       }
 
-      // Sumamos el dinero de las órdenes en su mes correspondiente
       fetchedOrders.forEach(o => {
         if (o.status !== 'Cancelado') {
           const od = new Date(o.created_at);
@@ -63,7 +55,6 @@ export default function AdminDashboard() {
         }
       });
       
-      // Calculamos la barra más alta para que la altura en CSS sea proporcional (Máx 200px)
       const maxVal = Math.max(...chartData.map(c => c.value), 100); 
       const finalChart = chartData.map(c => ({
         month: c.label,
@@ -72,7 +63,6 @@ export default function AdminDashboard() {
       }));
       setDynamicChart(finalChart);
 
-      // 5. Actividad Reciente Unificada
       const acts = [];
       fetchedDonations.forEach(d => acts.push({ id: `don-${d.id}`, text: `Donación: ${d.item_name} (${d.status})`, time: d.created_at.split('T')[0], timestamp: new Date(d.created_at).getTime() }));
       fetchedReturns.forEach(r => acts.push({ id: `ret-${r.id}`, text: `Devolución: DEV-00${r.id} (${r.status})`, time: r.created_at.split('T')[0], timestamp: new Date(r.created_at).getTime() }));
@@ -105,7 +95,6 @@ export default function AdminDashboard() {
             </div>
             <div>
               <p style={{ margin: 0, color: '#666', fontSize: '0.95rem', fontWeight: '600' }}>Ingresos del Mes</p>
-              {/* ACTUALIZADO: Muestra el dinero real calculado */}
               <h3 style={{ margin: '5px 0 0 0', fontSize: '1.8rem', color: 'var(--text-dark)' }}>
                 ${monthlyIncome.toFixed(2)}
               </h3>
@@ -156,7 +145,6 @@ export default function AdminDashboard() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
           
-          {/* ACTUALIZADO: Se eliminaron los divs anidados que dañaban el CSS del gráfico */}
           <div style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #eaeaea' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
               <h2 style={{ fontSize: '1.3rem', color: 'var(--text-dark)', margin: 0 }}>Resumen de Ingresos (Últimos 7 meses)</h2>
@@ -166,7 +154,7 @@ export default function AdminDashboard() {
               {dynamicChart.map((data, index) => (
                 <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '40px' }} title={`$${data.rawValue.toFixed(2)}`}>
                   <div style={{ 
-                    height: `${data.height}px`, // Altura calculada matemáticamente
+                    height: `${data.height}px`, 
                     width: '100%', 
                     backgroundColor: 'var(--primary-dark)', 
                     borderRadius: '4px 4px 0 0',

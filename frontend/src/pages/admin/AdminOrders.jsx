@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { FiSearch, FiEye, FiEdit, FiXCircle } from 'react-icons/fi';
 import AdminNavbar from '../../components/admin/AdminNavbar';
-import Modal from '../../components/ui/Modal'; // NUEVO: Importamos el Modal
+import Modal from '../../components/ui/Modal';
 import api from '../../services/api';
 
 export default function AdminOrders() {
   const [alertMessage, setAlertMessage] = useState(null);
   const [orders, setOrders] = useState([]);
-  
-  // NUEVO: Estados para manejar las ventanas flotantes y la orden seleccionada
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [newStatus, setNewStatus] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchInput, setSearchInput] = useState('');
+  const [activeSearch, setActiveSearch] = useState('');
 
   const triggerAlert = (message) => {
     setAlertMessage(message);
@@ -24,28 +27,30 @@ export default function AdminOrders() {
   useEffect(() => {
     const fetchAllOrders = async () => {
       try {
-        const response = await api.get('ordenes/');
-        setOrders(response.data);
+        const response = await api.get(`ordenes/?page=${currentPage}&search=${activeSearch}`);
+        setOrders(response.data.results);
+        setTotalPages(Math.ceil(response.data.count / 10));
       } catch (error) {
         console.error("Error al cargar las órdenes del sistema:", error);
       }
     };
     fetchAllOrders();
-  }, []);
+  }, [currentPage, activeSearch]);
 
-  // NUEVO: Función maestra que envía la actualización a Django
+  const handleSearch = () => {
+    setCurrentPage(1); 
+    setActiveSearch(searchInput);
+  };
+
   const handleStatusChange = async (id, statusToUpdate) => {
     try {
-      // Hacemos un PATCH enviando solo el nuevo estado
       await api.patch(`ordenes/${id}/`, { status: statusToUpdate });
-      
-      // Actualizamos la tabla de React instantáneamente sin recargar la página
       setOrders(orders.map(order => 
         order.id === id ? { ...order, status: statusToUpdate } : order
       ));
       
       triggerAlert(`Orden #${id} actualizada exitosamente a: ${statusToUpdate}`);
-      setShowStatusModal(false); // Cerramos el modal si estaba abierto
+      setShowStatusModal(false); 
     } catch (error) {
       console.error("Error al actualizar la orden:", error);
       triggerAlert("Error de conexión. No se pudo actualizar el estado.");
@@ -79,10 +84,13 @@ export default function AdminOrders() {
                 <input 
                   type="text" 
                   placeholder="Buscar por ID o cliente" 
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   style={{ padding: '10px 15px 10px 40px', border: '1px solid #ccc', borderRadius: '4px', width: '280px', fontSize: '1rem' }}
                 />
               </div>
-              <button className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px' }}>
+              <button onClick={handleSearch} className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px' }}>
                 Buscar
               </button>
             </div>
@@ -153,7 +161,6 @@ export default function AdminOrders() {
                       </div>
                       
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                        {/* Botón Ver Detalles */}
                         <button 
                           onClick={() => { setSelectedOrder(order); setShowViewModal(true); }} 
                           title="Ver Detalles" 
@@ -162,17 +169,15 @@ export default function AdminOrders() {
                           <FiEye size={20} />
                         </button>
                         
-                        {/* Botón Cambiar Estado */}
                         <button 
                           onClick={() => { setSelectedOrder(order); setNewStatus(order.status); setShowStatusModal(true); }} 
                           title="Cambiar Estado" 
-                          disabled={order.status === 'Cancelado'} // Opcional: no editar si está cancelado
+                          disabled={order.status === 'Cancelado'}
                           style={{ background: 'none', border: 'none', cursor: order.status === 'Cancelado' ? 'not-allowed' : 'pointer', color: '#4CAF50', opacity: order.status === 'Cancelado' ? 0.4 : 1 }}
                         >
                           <FiEdit size={20} />
                         </button>
 
-                        {/* Botón Cancelar (Con confirmación nativa) */}
                         <button 
                           onClick={() => { 
                             if (window.confirm(`¿Estás seguro de que deseas cancelar la Orden #${order.id}?`)) {
@@ -193,9 +198,33 @@ export default function AdminOrders() {
             </div>
           </div>
         </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  style={{ padding: '8px 16px', background: currentPage === 1 ? '#f5f5f5' : 'white', border: 'none', borderRight: '1px solid #ddd', color: currentPage === 1 ? '#aaa' : '#4CAF50', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                >
+                  Anterior
+                </button>
+                
+                <div style={{ padding: '8px 16px', background: 'white', borderRight: '1px solid #ddd', color: '#333', fontWeight: 'bold' }}>
+                  Página {currentPage} de {totalPages}
+                </div>
+
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  style={{ padding: '8px 16px', background: currentPage === totalPages ? '#f5f5f5' : 'white', border: 'none', color: currentPage === totalPages ? '#aaa' : '#4CAF50', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
+          </div>
       </main>
 
-      {/* MODAL 1: Ver Detalles */}
       <Modal isOpen={showViewModal} onClose={() => setShowViewModal(false)} title={`Detalles de la Orden #${selectedOrder?.id}`}>
         {selectedOrder && (
           <div style={{ textAlign: 'left', color: '#333', fontSize: '1.05rem', lineHeight: '1.6' }}>
@@ -221,7 +250,6 @@ export default function AdminOrders() {
             
             <h4 style={{ margin: '0 0 15px 0', color: 'var(--text-dark)', fontSize: '1.1rem' }}>Artículos Comprados:</h4>
             
-            {/* Contenedor de los productos tipo factura */}
             <div style={{ backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '8px', border: '1px solid #eaeaea', maxHeight: '250px', overflowY: 'auto', marginBottom: '20px' }}>
               {selectedOrder.items && selectedOrder.items.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -252,7 +280,6 @@ export default function AdminOrders() {
         )}
       </Modal>
 
-      {/* MODAL 2: Cambiar Estado */}
       <Modal isOpen={showStatusModal} onClose={() => setShowStatusModal(false)} title={`Cambiar Estado - Orden #${selectedOrder?.id}`}>
         {selectedOrder && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
@@ -283,7 +310,6 @@ export default function AdminOrders() {
           </div>
         )}
       </Modal>
-
     </div>
   );
 }

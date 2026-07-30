@@ -11,7 +11,7 @@ export default function Navbar() {
     return {
       color: isActive ? 'white' : '#ccc',
       textDecoration: 'none',
-      borderBottom: isActive ? '2px solid var(--accent-green)' : '2px solid transparent', // Usamos transparent para evitar saltos
+      borderBottom: isActive ? '2px solid var(--accent-green)' : '2px solid transparent',
       paddingBottom: '5px',
       fontWeight: '500',
       transition: 'all 0.2s ease-in-out'
@@ -37,7 +37,7 @@ export default function Navbar() {
         <div className="nav-actions">
           <div className="search-bar">
             <FiSearch color="#888" />
-            <input type="text" placeholder="Search" />
+            <input type="text" placeholder="Buscar" />
           </div>
           <Link to={isAuthenticated ? "/mi-cuenta" : "/login"} style={{ color: 'inherit' }} title={isAuthenticated ? "Mi Cuenta" : "Iniciar Sesión"}>
             <FiUser size={24} style={{ cursor: 'pointer', color: isAuthenticated ? 'var(--accent-green)' : 'inherit' }} />

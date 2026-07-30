@@ -24,6 +24,9 @@ export default function Inventory() {
   const currentItems = inventory.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(inventory.length / itemsPerPage);
 
+  const [searchInput, setSearchInput] = useState('');
+  const [activeSearch, setActiveSearch] = useState('');
+
   const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este componente de la base de datos?')) {
       try {
@@ -46,15 +49,21 @@ export default function Inventory() {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await api.get('inventario/componentes/');
-        setInventory(response.data); 
+        const response = await api.get(`inventario/componentes/?page=${currentPage}&search=${activeSearch}`);
+        setInventory(response.data.results);
+        setTotalPages(Math.ceil(response.data.count / 10)); 
       } catch (error) {
         console.error("Error al cargar el inventario:", error);
       }
     };
 
     fetchInventory();
-  }, []);
+  }, [currentPage, activeSearch]);
+
+  const handleSearch = () => {
+    setCurrentPage(1); 
+    setActiveSearch(searchInput);
+  };
 
   return (
     <div style={{ backgroundColor: '#f4f6f8', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -63,7 +72,6 @@ export default function Inventory() {
       <main style={{ flexGrow: 1, padding: '40px' }}>
         <div style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', maxWidth: '1200px', margin: '0 auto' }}>
           
-          {/* Cabecera y Controles */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
             <h1 style={{ fontSize: '2rem', color: 'var(--text-dark)', margin: 0 }}>Inventario</h1>
             
@@ -73,10 +81,13 @@ export default function Inventory() {
                 <input 
                   type="text" 
                   placeholder="Nombre" 
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   style={{ padding: '10px 15px 10px 40px', border: '1px solid #ccc', borderRadius: '4px', width: '250px', fontSize: '1rem' }}
                 />
               </div>
-              <button className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button onClick={handleSearch} className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 Buscar
               </button>
               <Link to="/admin/inventario/nuevo" style={{ textDecoration: 'none' }}>
@@ -115,56 +126,60 @@ export default function Inventory() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {currentItems.map((item, index) => (
-                <div 
-                  key={item.id} 
-                  style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 100px 100px', 
-                    backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white', 
-                    padding: '12px 15px', 
-                    textAlign: 'center', 
-                    alignItems: 'center',
-                    borderBottom: '1px solid #eaeaea'
-                  }}
-                >
-                  <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '500', color: '#333' }}>{item.name}</div>
-                  <div style={{ color: '#555' }}>${item.price}</div>
-                  
-                  <div>
-                    <span style={{ 
-                      backgroundColor: item.category === 'PC' ? '#e3f2fd' : '#f3e5f5', 
-                      color: item.category === 'PC' ? '#1976d2' : '#7b1fa2', 
-                      padding: '4px 10px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' 
-                    }}>
-                      {item.category || 'Componente'}
-                    </span>
-                  </div>
+              {currentItems.length === 0 ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>No hay piezas/PC registradas en el sistema.</div>
+              ) : (
+                currentItems.map((item, index) => (
+                  <div 
+                    key={item.id} 
+                    style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 100px 100px', 
+                      backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white', 
+                      padding: '12px 15px', 
+                      textAlign: 'center', 
+                      alignItems: 'center',
+                      borderBottom: '1px solid #eaeaea'
+                    }}
+                  >
+                    <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '500', color: '#333' }}>{item.name}</div>
+                    <div style={{ color: '#555' }}>${item.price}</div>
+                    
+                    <div>
+                      <span style={{ 
+                        backgroundColor: item.category === 'PC' ? '#e3f2fd' : '#f3e5f5', 
+                        color: item.category === 'PC' ? '#1976d2' : '#7b1fa2', 
+                        padding: '4px 10px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' 
+                      }}>
+                        {item.category || 'Componente'}
+                      </span>
+                    </div>
 
-                  <div>
-                    <span style={{ backgroundColor: '#e2e8f0', color: '#475569', padding: '4px 10px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' }}>
-                      {item.category === 'PC' ? '-' : item.type}
-                    </span>
-                  </div>
-                  <div>
-                    <span style={{ color: item.stock === 0 ? '#d9534f' : '#333', fontWeight: item.stock === 0 ? '700' : '500' }}>
-                      {item.stock === 0 ? 'Agotado' : item.stock}
-                    </span>
-                  </div>
-                  <div>
-                    <Link to={`/admin/inventario/editar/${item.id}`}>
-                      <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#333' }}>
-                        <FiEdit size={18} />
+                    <div>
+                      <span style={{ backgroundColor: '#e2e8f0', color: '#475569', padding: '4px 10px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' }}>
+                        {item.category === 'PC' ? '-' : item.type}
+                      </span>
+                    </div>
+                    <div>
+                      <span style={{ color: item.stock === 0 ? '#d9534f' : '#333', fontWeight: item.stock === 0 ? '700' : '500' }}>
+                        {item.stock === 0 ? 'Agotado' : item.stock}
+                      </span>
+                    </div>
+                    <div>
+                      <Link to={`/admin/inventario/editar/${item.id}`}>
+                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#333' }}>
+                          <FiEdit size={18} />
+                        </button>
+                      </Link>
+                    </div>
+                    <div>
+                      <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
+                        <FiTrash2 size={18} />
                       </button>
-                    </Link>
+                    </div>
                   </div>
-                  <div>
-                    <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d9534f' }}>
-                      <FiTrash2 size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 

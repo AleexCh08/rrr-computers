@@ -7,6 +7,9 @@ export default function AdminMessages() {
   const [messages, setMessages] = useState([]);
   const [alertMessage, setAlertMessage] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const triggerAlert = (message) => {
     setAlertMessage(message);
     setTimeout(() => setAlertMessage(null), 3000);
@@ -15,14 +18,19 @@ export default function AdminMessages() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await api.get('usuarios/admin-mensajes/');
-        setMessages(response.data);
+        const response = await api.get(`usuarios/admin-mensajes/?page=${currentPage}`);
+        setMessages(response.data.results);
+        setTotalPages(Math.ceil(response.data.count / 10));
       } catch (error) {
         console.error("Error al cargar mensajes:", error);
       }
     };
     fetchMessages();
-  }, []);
+  }, [currentPage]);
+
+  const handleSearch = () => {
+    setCurrentPage(1); 
+  };
 
   const handleMarkAsRead = async (id) => {
     try {
@@ -113,6 +121,32 @@ export default function AdminMessages() {
             </div>
           )}
         </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  style={{ padding: '8px 16px', background: currentPage === 1 ? '#f5f5f5' : 'white', border: 'none', borderRight: '1px solid #ddd', color: currentPage === 1 ? '#aaa' : '#4CAF50', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                >
+                  Anterior
+                </button>
+                
+                <div style={{ padding: '8px 16px', background: 'white', borderRight: '1px solid #ddd', color: '#333', fontWeight: 'bold' }}>
+                  Página {currentPage} de {totalPages}
+                </div>
+
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  style={{ padding: '8px 16px', background: currentPage === totalPages ? '#f5f5f5' : 'white', border: 'none', color: currentPage === totalPages ? '#aaa' : '#4CAF50', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
+          </div>
+        
       </main>
     </div>
   );

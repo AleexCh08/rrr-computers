@@ -18,17 +18,28 @@ export default function AdminDonations() {
   const [selectedDonation, setSelectedDonation] = useState(null);
   const [donations, setDonations] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchInput, setSearchInput] = useState('');
+  const [activeSearch, setActiveSearch] = useState('');
+
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        const response = await api.get('inventario/donaciones/');
-        setDonations(response.data);
+        const response = await api.get(`inventario/donaciones/?page=${currentPage}&search=${activeSearch}`);
+        setDonations(response.data.results);
+        setTotalPages(Math.ceil(response.data.count / 10));
       } catch (error) {
         console.error("Error al cargar donaciones:", error);
       }
     };
     fetchDonations();
-  }, []);
+  }, [currentPage, activeSearch]);
+
+  const handleSearch = () => {
+    setCurrentPage(1); 
+    setActiveSearch(searchInput);
+  };
 
   const handleStatusChange = async (id, newStatus) => {
     try {
@@ -43,13 +54,12 @@ export default function AdminDonations() {
     }
   };
 
-
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'Pendiente': return { bg: '#fff3cd', color: '#856404' }; // Amarillo
-      case 'Aprobado': return { bg: '#d1ecf1', color: '#0c5460' };  // Azul claro
-      case 'Recibido': return { bg: '#d4edda', color: '#155724' };  // Verde
-      case 'Rechazado': return { bg: '#f8d7da', color: '#721c24' }; // Rojo
+      case 'Pendiente': return { bg: '#fff3cd', color: '#856404' }; 
+      case 'Aprobado': return { bg: '#d1ecf1', color: '#0c5460' };  
+      case 'Recibido': return { bg: '#d4edda', color: '#155724' };  
+      case 'Rechazado': return { bg: '#f8d7da', color: '#721c24' }; 
       default: return { bg: '#e2e8f0', color: '#475569' };
     }
   };
@@ -69,17 +79,19 @@ export default function AdminDonations() {
                 <FiSearch style={{ position: 'absolute', top: '50%', left: '15px', transform: 'translateY(-50%)', color: '#888' }} />
                 <input 
                   type="text" 
-                  placeholder="Buscar donante o pieza" 
+                  placeholder="Buscar donante o pieza"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()} 
                   style={{ padding: '10px 15px 10px 40px', border: '1px solid #ccc', borderRadius: '4px', width: '280px', fontSize: '1rem' }}
                 />
               </div>
-              <button className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px' }}>
+              <button onClick={handleSearch} className="btn-primary" style={{ backgroundColor: '#4CAF50', padding: '10px 25px' }}>
                 Buscar
               </button>
             </div>
           </div>
 
-          {/* Alerta Visual */}
           {alertMessage && (
             <div style={{ 
               backgroundColor: '#ebebeb', 
@@ -96,7 +108,6 @@ export default function AdminDonations() {
             </div>
           )}
 
-          {/* Tabla de Datos */}
           <div style={{ border: '1px solid #eaeaea', borderRadius: '8px', overflow: 'hidden' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '120px 2fr 2fr 1.5fr 150px 150px', backgroundColor: '#5A7D9A', color: 'white', fontWeight: '600', padding: '15px', textAlign: 'center' }}>
               <div>Fecha</div>
@@ -108,84 +119,110 @@ export default function AdminDonations() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {donations.map((item, index) => {
-                const statusStyle = getStatusStyle(item.status);
-                
-                return (
-                  <div 
-                    key={item.id} 
-                    style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: '120px 2fr 2fr 1.5fr 150px 150px', 
-                      backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white', 
-                      padding: '12px 15px', 
-                      textAlign: 'center', 
-                      alignItems: 'center',
-                      borderBottom: '1px solid #eaeaea'
-                    }}
-                  >
-                    <div style={{ color: '#666', fontSize: '0.9rem' }}>{item.created_at.split('T')[0]}</div>
-                    <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '600', color: '#333' }}>{item.donor_name}</div>
-                    <div style={{ textAlign: 'left', color: '#444' }}>{item.item_name}</div>
-                    <div style={{ color: '#555', fontSize: '0.9rem' }}>{item.condition}</div>
-                    
-                    {/* Badge de Estado */}
-                    <div>
-                      <span style={{ 
-                        backgroundColor: statusStyle.bg, 
-                        color: statusStyle.color, 
-                        padding: '5px 12px', 
-                        borderRadius: '20px', 
-                        fontSize: '0.85rem', 
-                        fontWeight: '700' 
-                      }}>
-                        {item.status}
-                      </span>
-                    </div>
-                    
-                    {/* Botones de Acción */}
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                      <button onClick={() => { setSelectedDonation(item); setShowModal(true); }} title="Ver Detalles" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
-                        <FiEye size={20} />
-                      </button>
+              {donations.length === 0 ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>No hay donaciones registradas en el sistema.</div>
+              ) : (
+                donations.map((item, index) => {
+                  const statusStyle = getStatusStyle(item.status);
+                  
+                  return (
+                    <div 
+                      key={item.id} 
+                      style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: '120px 2fr 2fr 1.5fr 150px 150px', 
+                        backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white', 
+                        padding: '12px 15px', 
+                        textAlign: 'center', 
+                        alignItems: 'center',
+                        borderBottom: '1px solid #eaeaea'
+                      }}
+                    >
+                      <div style={{ color: '#666', fontSize: '0.9rem' }}>{item.created_at.split('T')[0]}</div>
+                      <div style={{ textAlign: 'left', paddingLeft: '10px', fontWeight: '600', color: '#333' }}>{item.donor_name}</div>
+                      <div style={{ textAlign: 'left', color: '#444' }}>{item.item_name}</div>
+                      <div style={{ color: '#555', fontSize: '0.9rem' }}>{item.condition}</div>
                       
-                      {/* Conectamos los botones reales */}
-                      <button 
-                        onClick={() => handleStatusChange(item.id, 'Aprobado')} 
-                        disabled={item.status !== 'Pendiente'}
-                        title="Aprobar" 
-                        style={{ 
-                          background: 'none', 
-                          border: 'none', 
-                          cursor: item.status !== 'Pendiente' ? 'not-allowed' : 'pointer', 
-                          color: '#4CAF50', 
-                          opacity: item.status !== 'Pendiente' ? 0.3 : 1 
-                        }}
-                      >
-                        <FiCheck size={20} />
-                      </button>
-                      <button 
-                        onClick={() => handleStatusChange(item.id, 'Rechazado')} 
-                        disabled={item.status !== 'Pendiente'}
-                        title="Rechazar" 
-                        style={{ 
-                          background: 'none', 
-                          border: 'none', 
-                          cursor: item.status !== 'Pendiente' ? 'not-allowed' : 'pointer', 
-                          color: '#d9534f', 
-                          opacity: item.status !== 'Pendiente' ? 0.3 : 1 
-                        }}
-                      >
-                        <FiX size={20} />
-                      </button>
+                      <div>
+                        <span style={{ 
+                          backgroundColor: statusStyle.bg, 
+                          color: statusStyle.color, 
+                          padding: '5px 12px', 
+                          borderRadius: '20px', 
+                          fontSize: '0.85rem', 
+                          fontWeight: '700' 
+                        }}>
+                          {item.status}
+                        </span>
+                      </div>
+                      
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                        <button onClick={() => { setSelectedDonation(item); setShowModal(true); }} title="Ver Detalles" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A7D9A' }}>
+                          <FiEye size={20} />
+                        </button>
+                        
+                        <button 
+                          onClick={() => handleStatusChange(item.id, 'Aprobado')} 
+                          disabled={item.status !== 'Pendiente'}
+                          title="Aprobar" 
+                          style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            cursor: item.status !== 'Pendiente' ? 'not-allowed' : 'pointer', 
+                            color: '#4CAF50', 
+                            opacity: item.status !== 'Pendiente' ? 0.3 : 1 
+                          }}
+                        >
+                          <FiCheck size={20} />
+                        </button>
+                        <button 
+                          onClick={() => handleStatusChange(item.id, 'Rechazado')} 
+                          disabled={item.status !== 'Pendiente'}
+                          title="Rechazar" 
+                          style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            cursor: item.status !== 'Pendiente' ? 'not-allowed' : 'pointer', 
+                            color: '#d9534f', 
+                            opacity: item.status !== 'Pendiente' ? 0.3 : 1 
+                          }}
+                        >
+                          <FiX size={20} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })
+              )}
+              </div>
           </div>
 
         </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  style={{ padding: '8px 16px', background: currentPage === 1 ? '#f5f5f5' : 'white', border: 'none', borderRight: '1px solid #ddd', color: currentPage === 1 ? '#aaa' : '#4CAF50', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                >
+                  Anterior
+                </button>
+                
+                <div style={{ padding: '8px 16px', background: 'white', borderRight: '1px solid #ddd', color: '#333', fontWeight: 'bold' }}>
+                  Página {currentPage} de {totalPages}
+                </div>
+
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  style={{ padding: '8px 16px', background: currentPage === totalPages ? '#f5f5f5' : 'white', border: 'none', color: currentPage === totalPages ? '#aaa' : '#4CAF50', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
+          </div>
       </main>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Detalles Completos de la Donación">
         {selectedDonation && (

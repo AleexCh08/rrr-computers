@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import generics, viewsets, permissions
+from rest_framework import generics, viewsets, permissions, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserSerializer, RegisterSerializer
@@ -26,9 +26,12 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=400)
 
 class AdminUserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser] 
+
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['first_name', 'username', 'email']
 
 class ContactMessageCreateView(generics.CreateAPIView):
     queryset = ContactMessage.objects.all()
