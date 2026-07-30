@@ -56,7 +56,7 @@ export default function Catalog() {
     const fetchComponents = async () => {
       try {
         const response = await api.get('inventario/componentes/');
-        const availableItems = response.data.filter(item => item.stock > 0);
+        const availableItems = response.data.results.filter(item => item.stock > 0);
         setComponents(availableItems);
       } catch (error) {
         console.error("Error al cargar el catálogo:", error);
@@ -91,7 +91,7 @@ export default function Catalog() {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  setCurrentPage(1); // Regresamos a la pag 1 al teclear
+                  setCurrentPage(1); 
                 }}
               />
             </div>

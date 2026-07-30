@@ -29,10 +29,10 @@ export default function MyAccount() {
         });
 
         const donacionesRes = await api.get('inventario/donaciones/mis_donaciones/');
-        setMyDonations(donacionesRes.data);
+        setMyDonations(donacionesRes.data.results);
 
         const ordersRes = await api.get('ordenes/');
-        setMyOrders(ordersRes.data);
+        setMyOrders(ordersRes.data.results);
         
       } catch (error) {
         console.error("Error al cargar perfil:", error);
@@ -85,10 +85,7 @@ export default function MyAccount() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '30px', alignItems: 'start' }}>
           
-          {/* COLUMNA IZQUIERDA: Menú lateral */}
           <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #eaeaea', overflow: 'hidden' }}>
-            
-            {/* Resumen del perfil */}
             <div style={{ padding: '20px', borderBottom: '1px solid #eee', textAlign: 'center' }}>
               <div style={{ width: '70px', height: '70px', backgroundColor: '#e2e8f0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px', color: '#64748b' }}>
                 <FiUser size={30} />
@@ -97,7 +94,6 @@ export default function MyAccount() {
               <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>{user.email}</p>
             </div>
 
-            {/* Opciones de navegación */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <button 
                 onClick={() => setActiveTab('orders')}
@@ -129,10 +125,8 @@ export default function MyAccount() {
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: Contenido Dinámico */}
           <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #eaeaea' }}>
             
-            {/* VISTA: MIS ÓRDENES */}
             {activeTab === 'orders' && (
               <div>
                 <h2 style={{ fontSize: '1.5rem', color: 'var(--text-dark)', marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #eee' }}>Historial de Órdenes</h2>
@@ -151,7 +145,6 @@ export default function MyAccount() {
               </div>
             )}
 
-            {/* VISTA: MIS DONACIONES */}
             {activeTab === 'donations' && (
               <div>
                 <h2 style={{ fontSize: '1.5rem', color: 'var(--text-dark)', marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #eee' }}>Mis Donaciones</h2>
@@ -176,19 +169,15 @@ export default function MyAccount() {
               </div>
             )}
 
-            {/* VISTA: AJUSTES DE PERFIL */}
             {activeTab === 'settings' && (
               <div>
                 <h2 style={{ fontSize: '1.5rem', color: 'var(--text-dark)', marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #eee' }}>Ajustes de Perfil</h2>
-                
-                {/* NUEVO: Mensaje de confirmación visual */}
                 {alertMessage && (
                   <div style={{ backgroundColor: '#d4edda', color: '#155724', padding: '12px 20px', borderRadius: '4px', marginBottom: '20px', fontWeight: '600', borderLeft: '4px solid #28a745' }}>
                     {alertMessage}
                   </div>
                 )}
 
-                {/* ACTUALIZADO: onSubmit y conexión de los inputs con el estado 'user' */}
                 <form onSubmit={handleSaveChanges} style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>

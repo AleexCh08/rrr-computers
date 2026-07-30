@@ -26,7 +26,7 @@ export default function Assemble() {
     const fetchComponents = async () => {
       try {
         const response = await api.get('inventario/componentes/');
-        setInventory(response.data.filter(item => item.category === 'Componente' && item.stock > 0));
+        setInventory(response.data.results.filter(item => item.category === 'Componente' && item.stock > 0));
       } catch (error) {
         console.error("Error al cargar inventario:", error);
       }
@@ -83,7 +83,6 @@ export default function Assemble() {
               {build.map((item) => (
                 <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '180px 1fr 100px 120px', alignItems: 'center', gap: '20px', padding: '20px', border: '1px solid #eaeaea', borderRadius: '8px', backgroundColor: item.selected ? '#fff' : '#fafafa' }}>
                   
-                  {/* Categoría */}
                   <div style={{ fontWeight: '600', color: 'var(--text-dark)', fontSize: '1.05rem' }}>
                     {item.category}
                   </div>
@@ -124,14 +123,12 @@ export default function Assemble() {
           <div style={{ backgroundColor: 'white', padding: '35px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #eaeaea', position: 'sticky', top: '20px' }}>
             <h2 style={{ fontSize: '1.5rem', color: 'var(--text-dark)', marginBottom: '25px' }}>Resumen del Ensamble</h2>
             
-            {/* Mensaje de éxito flotante */}
             {alertMessage && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 15px', backgroundColor: '#d4edda', color: '#155724', borderRadius: '8px', marginBottom: '20px', fontWeight: '600', borderLeft: '4px solid #28a745' }}>
                 <FiCheckCircle size={20} /> {alertMessage}
               </div>
             )}
 
-            {/* 1. Alertas de Incompatibilidad Grave */}
             {compatibilityErrors.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '25px' }}>
                 {compatibilityErrors.map((error, index) => (
@@ -143,7 +140,6 @@ export default function Assemble() {
               </div>
             )}
 
-            {/* 2. Validación de Piezas Faltantes */}
             {compatibilityErrors.length === 0 && !hasAllEssentials && (
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '15px', backgroundColor: '#fff3cd', color: '#856404', borderRadius: '8px', fontSize: '0.95rem', marginBottom: '25px', border: '1px solid #ffeeba' }}>
                 <FiAlertCircle size={20} style={{ flexShrink: 0, marginTop: '2px' }} />
@@ -151,7 +147,6 @@ export default function Assemble() {
               </div>
             )}
 
-            {/* 3. Aprobación Total */}
             {isComplete && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', backgroundColor: '#e8f5e9', color: '#2e7d32', borderRadius: '8px', fontWeight: '600', marginBottom: '25px', border: '1px solid #c8e6c9' }}>
                 <FiCheckCircle size={20} /> Componentes totalmente compatibles. ¡Tu PC encenderá!

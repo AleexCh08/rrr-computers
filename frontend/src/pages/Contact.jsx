@@ -48,7 +48,6 @@ export default function Contact() {
     <div className="page-container" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      {/* Fondo azul superior */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '400px', backgroundColor: 'var(--primary-dark)', zIndex: -1 }}></div>
 
       <main style={{ flexGrow: 1, padding: '60px 20px', display: 'flex', justifyContent: 'center' }}>
@@ -66,12 +65,10 @@ export default function Contact() {
             border: '1px solid #eaeaea'
           }}
         >
-          {/* Navegación Breadcrumb */}
           <div style={{ fontSize: '0.9rem', marginBottom: '30px', color: '#666', fontWeight: '600'}}>
             <Link to="/" style={{ color: '#333' }}>Home</Link> <span style={{ margin: '0 8px', color: '#ccc' }}>&gt;</span> Contacto
           </div>
 
-          {/* Encabezado */}
           <div style={{ marginBottom: '50px', textAlign: 'center' }}>
             <h1 style={{ fontSize: '2.8rem', marginBottom: '15px', color: 'var(--text-dark)' }}>Contacto</h1>
             <p style={{ fontSize: '1.2rem', color: '#333', maxWidth: '600px', lineHeight: '1.4', textAlign: 'center', margin: '0 auto' }}>
@@ -81,7 +78,6 @@ export default function Contact() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px' }}>
             
-            {/* Columna Izquierda: Información */}
             <div>
               <h3 style={{ fontSize: '1.5rem', marginBottom: '25px', color: 'var(--text-dark)' }}>Medios de contacto</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '40px', fontSize: '1.15rem', color: '#333' }}>
@@ -96,7 +92,6 @@ export default function Contact() {
               </p>
             </div>
 
-            {/* Columna Derecha: Formulario */}
             <div>
               <h3 style={{ fontSize: '1.5rem', marginBottom: '25px', color: 'var(--text-dark)' }}>Formulario de contacto</h3>
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>

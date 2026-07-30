@@ -14,7 +14,7 @@ export default function PartsSection() {
     const fetchComponents = async () => {
       try {
         const response = await api.get('inventario/componentes/');
-        const availableParts = response.data.filter(item => item.category === 'Componente' && item.stock > 0);
+        const availableParts = response.data.results.filter(item => item.category === 'Componente' && item.stock > 0);
         setComponents(availableParts);
       } catch (error) {
         console.error("Error al cargar los componentes para el Home:", error);

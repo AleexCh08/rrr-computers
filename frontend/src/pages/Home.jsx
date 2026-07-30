@@ -19,7 +19,7 @@ export default function Home() {
     const fetchPCs = async () => {
       try {
         const response = await api.get('inventario/componentes/');
-        const availablePCs = response.data.filter(item => item.category === 'PC' && item.stock > 0);
+        const availablePCs = response.data.results.filter(item => item.category === 'PC' && item.stock > 0);
         setPcs(availablePCs);
       } catch (error) {
         console.error("Error al cargar las PCs para el Home:", error);

@@ -7,15 +7,9 @@ import DonationForm from '../components/donations/DonationForm';
 export default function Donations() {
   return (
     <div className="page-container" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar />
-      
-      {/* Fondo azul absoluto que ocupa la parte superior detrás del formulario */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '400px', backgroundColor: 'var(--primary-dark)', zIndex: -1 }}></div>
-      
-      <main style={{ flexGrow: 1, padding: '60px 20px', display: 'flex', justifyContent: 'center' }}>
-
-        
-        
+      <Navbar />    
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '400px', backgroundColor: 'var(--primary-dark)', zIndex: -1 }}></div>   
+      <main style={{ flexGrow: 1, padding: '60px 20px', display: 'flex', justifyContent: 'center' }}>  
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,20 +27,14 @@ export default function Donations() {
           <div style={{ fontSize: '0.9rem', marginBottom: '30px', color: '#666', fontWeight: '600' }}>
             <Link to="/" style={{ color: '#333' }}>Home</Link> <span style={{ margin: '0 8px', color: '#ccc' }}>&gt;</span> Donar
           </div>
-          
-          {/* Cabecera del formulario */}
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h1 style={{ fontSize: '2.5rem', marginBottom: '15px' }}>Formulario De Donación</h1>
             <p style={{ fontSize: '1.2rem', color: '#444' }}>Completa el siguiente formulario para registrar tu donación</p>
           </div>
 
-          {/* Formulario extraído a su propio componente */}
-          <DonationForm />
-          
-        </motion.div>
-        
+          <DonationForm />         
+        </motion.div>        
       </main>
-
       <Footer />
     </div>
   );
