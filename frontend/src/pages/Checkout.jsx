@@ -11,7 +11,10 @@ export default function Checkout() {
   
   const [paymentMethod, setPaymentMethod] = useState('tarjeta');
   const [showModal, setShowModal] = useState(false);
+
   const [clientName, setClientName] = useState('');
+  const [phone, setPhone] = useState(''); 
+  const [address, setAddress] = useState('');
   
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -26,7 +29,9 @@ export default function Checkout() {
 
       try {
         const response = await api.get('usuarios/perfil/');
-        setClientName(response.data.first_name || response.data.username);
+        setClientName(response.data.first_name || response.data.username || '');
+        setPhone(response.data.phone && response.data.phone !== 'No registrado' ? response.data.phone : '');
+        setAddress(response.data.address && response.data.address !== 'No registrada' ? response.data.address : '');
       } catch (error) {
         console.error("Error validando sesión:", error);
         navigate('/login');
@@ -130,7 +135,7 @@ export default function Checkout() {
                 
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Dirección Exacta</label>
-                  <input type="text" required className="form-input" placeholder="Calle, Avenida, Edificio, Apartamento..." />
+                  <input type="text" required className="form-input" placeholder="Calle, Avenida, Edificio, Apartamento..." value={address} onChange={(e) => setAddress(e.target.value)} />
                 </div>
 
                 <div>
@@ -145,7 +150,7 @@ export default function Checkout() {
 
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Teléfono de Contacto</label>
-                  <input type="tel" required className="form-input" placeholder="+58 412 0000000" />
+                  <input type="tel" required className="form-input" placeholder="+58 412 0000000" value={phone} onChange={(e) => setPhone(e.target.value)} />
                 </div>
               </div>
             </div>

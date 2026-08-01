@@ -8,7 +8,7 @@ export default function MyAccount() {
   const [activeTab, setActiveTab] = useState('orders');
 
   const [alertMessage, setAlertMessage] = useState(null);
-  const [user, setUser] = useState({ name: '', email: '', phone: 'No registrado', address: 'No registrada' });
+  const [user, setUser] = useState({ name: '', email: '', phone: '', address: '' });
   const [myOrders, setMyOrders] = useState([]);
   const [myDonations, setMyDonations] = useState([]);
 
@@ -24,8 +24,8 @@ export default function MyAccount() {
         setUser({
           name: response.data.first_name || response.data.username,
           email: response.data.email,
-          phone: 'No registrado',
-          address: 'No registrada'
+          phone: response.data.phone && response.data.phone !== 'No registrado' ? response.data.phone : '',
+          address: response.data.address && response.data.address !== 'No registrada' ? response.data.address : ''
         });
 
         const donacionesRes = await api.get('inventario/donaciones/mis_donaciones/');

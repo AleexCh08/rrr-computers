@@ -17,58 +17,42 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchDashboardMetrics = async () => {
-      let fetchedDonations = [], fetchedInventory = [], fetchedReturns = [], fetchedOrders = [], fetchedUsers = [], fetchedMessages = [];
-
-      try { const res = await api.get('inventario/donaciones/'); fetchedDonations = res.data.results; } catch(e) { console.warn("Error donaciones"); }
-      try { const res = await api.get('inventario/componentes/'); fetchedInventory = res.data.results; } catch(e) { console.warn("Error inventario"); }
-      try { const res = await api.get('devoluciones/'); fetchedReturns = res.data.results; } catch(e) { console.warn("Error devoluciones"); }
-      try { const res = await api.get('ordenes/'); fetchedOrders = res.data.results; } catch(e) { console.warn("Error órdenes"); }
-      try { const res = await api.get('usuarios/admin-users/'); fetchedUsers = res.data.results; } catch(e) { console.warn("Error usuarios"); }
-      try { const res = await api.get('usuarios/admin-mensajes/'); fetchedMessages = res.data.results; } catch(e) { console.warn("Error mensajes"); }
-
-      setPendingDonations(fetchedDonations.filter(d => d.status === 'Pendiente').length);
-      setStockAlerts(fetchedInventory.filter(comp => comp.stock <= 5).length);
-      setTotalMessages(fetchedMessages.filter(m => !m.is_read).length);
-      setActiveOrders(fetchedOrders.filter(o => o.status !== 'Entregado' && o.status !== 'Cancelado').length);
-
-      const now = new Date();
-      const currentMonthOrders = fetchedOrders.filter(o => {
-        const oDate = new Date(o.created_at);
-        return o.status !== 'Cancelado' && oDate.getMonth() === now.getMonth() && oDate.getFullYear() === now.getFullYear();
-      });
-      const monthTotal = currentMonthOrders.reduce((acc, order) => acc + parseFloat(order.total), 0);
-      setMonthlyIncome(monthTotal);
-
-      const monthsLabel = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-      const chartData = [];
       
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        chartData.push({ monthIndex: d.getMonth(), year: d.getFullYear(), label: monthsLabel[d.getMonth()], value: 0 });
+      try {
+        const metricaRes = await api.get('metricas/');
+        const data = metricaRes.data;
+        
+        setPendingDonations(data.pending_donations);
+        setStockAlerts(data.stock_alerts);
+        setTotalMessages(data.unread_messages);
+        setActiveOrders(data.active_orders);
+        setMonthlyIncome(data.monthly_income);
+
+        const maxVal = Math.max(...data.chart_data.map(c => c.value), 100); 
+        const finalChart = data.chart_data.map(c => ({
+          month: c.label,
+          rawValue: c.value,
+          height: (c.value / maxVal) * 200 
+        }));
+        setDynamicChart(finalChart);
+      } catch(e) {
+        console.error("Error al cargar las métricas centrales", e);
       }
 
-      fetchedOrders.forEach(o => {
-        if (o.status !== 'Cancelado') {
-          const od = new Date(o.created_at);
-          const target = chartData.find(c => c.monthIndex === od.getMonth() && c.year === od.getFullYear());
-          if (target) target.value += parseFloat(o.total);
-        }
-      });
-      
-      const maxVal = Math.max(...chartData.map(c => c.value), 100); 
-      const finalChart = chartData.map(c => ({
-        month: c.label,
-        rawValue: c.value,
-        height: (c.value / maxVal) * 200 
-      }));
-      setDynamicChart(finalChart);
+      let fetchedDonations = [], fetchedReturns = [], fetchedOrders = [], fetchedUsers = [], fetchedMessages = [];
+
+      try { const res = await api.get('inventario/donaciones/'); fetchedDonations = res.data.results || res.data; } catch(e) {}
+      try { const res = await api.get('devoluciones/'); fetchedReturns = res.data.results || res.data; } catch(e) {}
+      try { const res = await api.get('ordenes/'); fetchedOrders = res.data.results || res.data; } catch(e) {}
+      try { const res = await api.get('usuarios/admin-users/'); fetchedUsers = res.data.results || res.data; } catch(e) {}
+      try { const res = await api.get('usuarios/admin-mensajes/'); fetchedMessages = res.data.results || res.data; } catch(e) {}
 
       const acts = [];
       fetchedDonations.forEach(d => acts.push({ id: `don-${d.id}`, text: `Donación: ${d.item_name} (${d.status})`, time: d.created_at.split('T')[0], timestamp: new Date(d.created_at).getTime() }));
       fetchedReturns.forEach(r => acts.push({ id: `ret-${r.id}`, text: `Devolución: DEV-00${r.id} (${r.status})`, time: r.created_at.split('T')[0], timestamp: new Date(r.created_at).getTime() }));
       fetchedUsers.forEach(u => acts.push({ id: `usr-${u.id}`, text: `Nuevo usuario: ${u.first_name || u.username}`, time: u.date_joined ? u.date_joined.split('T')[0] : 'Reciente', timestamp: u.date_joined ? new Date(u.date_joined).getTime() : Date.now() }));
       fetchedMessages.forEach(m => acts.push({ id: `msg-${m.id}`, text: `Mensaje de ${m.name}`, time: m.created_at.split('T')[0], timestamp: new Date(m.created_at).getTime() }));
-      fetchedOrders.forEach(o => acts.push({ id: `ord-${o.id}`, text: `Orden de ${o.client_name} ($${o.total})`, time: o.created_at.split('T')[0], timestamp: new Date(o.created_at).getTime() }));
+      fetchedOrders.forEach(o => acts.push({ id: `ord-${o.id}`, text: `Orden de ${o.client_name} - ${o.status}`, time: o.created_at.split('T')[0], timestamp: new Date(o.created_at).getTime() }));
 
       setRecentActivity(acts.sort((a, b) => b.timestamp - a.timestamp).slice(0, 20));
     };
