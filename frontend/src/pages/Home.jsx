@@ -40,7 +40,7 @@ export default function Home() {
         style={{ padding: '60px 20px', textAlign: 'center', position: 'relative', zIndex: 10 }}
       >
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '65%', backgroundColor: 'var(--primary-dark)', zIndex: -1 }}></div>        
-        <div className="container" style={{ background: 'white', padding: '40px 50px', borderRadius: '15px', boxShadow: '0 12px 35px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '50px', border: '1px solid #d1d1d1' }}>
+        <div className="container hero-content" style={{ background: 'white', padding: '40px 50px', borderRadius: '15px', boxShadow: '0 12px 35px rgba(0,0,0,0.18)', border: '1px solid #d1d1d1' }}>
             
             <motion.div
               whileHover={{ scale: 1.05, rotate: 2 }} 
@@ -52,14 +52,15 @@ export default function Home() {
               <img src="/favicon.png" alt="RRR Computers Logo" style={{ width: '150px', objectFit: 'contain', filter: 'drop-shadow(0px 8px 15px rgba(0,0,0,0.1))' }} />
             </motion.div>
 
-            <h1 style={{ fontSize: '2.2rem', maxWidth: '550px', textAlign: 'center', lineHeight: '1.3', flex: '1 1 auto', margin: 0, color: 'var(--text-dark)' }}>
+            <h1 className="hero-title" style={{ flex: '1 1 auto', textAlign: 'center' }}>
               Nuestro objetivo es Reparar, Reusar y Reciclar material electrónico, encontrándoles una segunda vida y utilidad
             </h1>
             
             <motion.div 
+              className="hero-icon"
               whileHover={{ scale: 1.1, rotate: 2 }} 
               transition={{ duration: 0.3 }}
-              style={{ fontSize: '130px', color: 'var(--accent-green)', display: 'flex', flex: '0 0 auto' }}
+              style={{ flex: '0 0 auto' }}
             >
               <MdRecycling />
             </motion.div>
@@ -69,15 +70,15 @@ export default function Home() {
 
       {/* CATÁLOGO SECTION */}
       <section className="container" style={{ padding: '40px 0' }}>
-        <div style={{ background: 'white', padding: '40px', borderRadius: '15px', boxShadow: '0 12px 35px rgba(0,0,0,0.18)', border: '1px solid #d1d1d1', display: 'flex', gap: '50px' }}>
-          <div style={{ width: '25%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '2.5rem' }}>Catálogo</h2>
+        <div className="catalog-layout" style={{ background: 'white', padding: '40px', borderRadius: '15px', boxShadow: '0 12px 35px rgba(0,0,0,0.18)', border: '1px solid #d1d1d1' }}>
+          <div className="catalog-text">
+            <h2 className="section-title">Catálogo</h2>
             <p style={{ margin: '20px 0', color: '#555', fontSize: '1.1rem' }}>Encuentra computadoras prediseñadas</p>
             <Link to="/catalogo">
               <button className="btn-primary">Ver más</button>
             </Link>        
           </div>
-          <div style={{ width: '75%' }}>
+          <div className="catalog-carousel">
              <ProductCarousel>
                {pcs.length === 0 ? (
                  <div style={{ width: '100%', textAlign: 'center', padding: '40px', color: '#666' }}>
@@ -104,12 +105,12 @@ export default function Home() {
       <section style={{ backgroundColor: 'var(--primary-dark)', color: 'white', padding: '80px 0', textAlign: 'center' }}>
         <div className="container">
           <h2 style={{ fontSize: '2.5rem', marginBottom: '50px' }}>Personaliza</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', marginBottom: '50px' }}>
+          <div className="personalize-grid">
             <p style={{ fontSize: '1.1rem', color: '#ccc' }}>Diseña una computadora pensada en ti y tus necesidades</p>
             <p style={{ fontSize: '1.1rem', color: '#ccc' }}>Completa el formulario o contacta con nosotros para iniciar el proceso</p>
             <p style={{ fontSize: '1.1rem', color: '#ccc' }}>Ahorra costos comprando lo que necesitas</p>
           </div>
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+          <div className="personalize-actions">
             <Link to="/ensamblar">
               <button className="btn-primary" style={{ padding: '15px 30px', fontSize: '1.1rem' }}>Ensambla tu Computadora</button>
             </Link>
