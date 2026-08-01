@@ -1,10 +1,49 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiSearch, FiUser, FiShoppingCart } from 'react-icons/fi';
 import './Navbar.css';
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+
   const isAuthenticated = Boolean(localStorage.getItem('access_token'));
+
+  const executeSearch = () => {
+    if (searchTerm.trim() === '') return;
+    
+    const term = searchTerm.toLowerCase().trim();
+    const originalTerm = searchTerm; 
+    
+    setSearchTerm(''); 
+
+    if (term.includes('devolucion') || term.includes('devolver') || term.includes('garantia')) {
+      navigate('/devolucion');
+    } 
+    else if (term.includes('donar') || term.includes('donacion') || term.includes('regalar')) {
+      navigate('/donar');
+    } 
+    else if (term.includes('ensamblar') || term.includes('armar') || term.includes('pc')) {
+      navigate('/ensamblar');
+    } 
+    else if (term.includes('nosotros') || term.includes('contacto') || term.includes('ubicacion')) {
+      navigate('/nosotros'); 
+    } 
+    else if (term.includes('asesoria') || term.includes('ayuda')) {
+      navigate('/asesoria');
+    } 
+    else {
+      navigate(`/catalogo?q=${originalTerm}`);
+    }
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      executeSearch();
+    }
+  };
+
   const getLinkStyle = (path) => {
     const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
     
@@ -36,8 +75,18 @@ export default function Navbar() {
         </ul>
         <div className="nav-actions">
           <div className="search-bar">
-            <FiSearch color="#888" />
-            <input type="text" placeholder="Buscar" />
+            <FiSearch 
+              color="#888" 
+              style={{ cursor: 'pointer' }} 
+              onClick={executeSearch}
+            />
+            <input 
+              type="text" 
+              placeholder="Buscar" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleSearch}
+            />
           </div>
           <Link to={isAuthenticated ? "/mi-cuenta" : "/login"} style={{ color: 'inherit' }} title={isAuthenticated ? "Mi Cuenta" : "Iniciar Sesión"}>
             <FiUser size={24} style={{ cursor: 'pointer', color: isAuthenticated ? 'var(--accent-green)' : 'inherit' }} />
