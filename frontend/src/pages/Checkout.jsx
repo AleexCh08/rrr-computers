@@ -15,10 +15,14 @@ export default function Checkout() {
   const [clientName, setClientName] = useState('');
   const [phone, setPhone] = useState(''); 
   const [address, setAddress] = useState('');
+  const [city, setCity] = useState(''); 
+  const [zipCode, setZipCode] = useState('');
   
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [orderId, setOrderId] = useState(null);
+
+  const [paymentReference, setPaymentReference] = useState('');
 
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
@@ -60,6 +64,10 @@ export default function Checkout() {
     
     const payload = {
       client_name: clientName,
+      phone: phone,
+      shipping_address: `${address}, ${city}. CP: ${zipCode}`, 
+      payment_method: paymentMethod,
+      payment_reference: paymentMethod === 'transferencia' ? paymentReference : 'Tarjeta Crédito',
       total: total.toFixed(2),
       items: cartItems.map(item => ({
         component_id: item.id,
@@ -140,12 +148,12 @@ export default function Checkout() {
 
                 <div>
                   <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Ciudad</label>
-                  <input type="text" required className="form-input" placeholder="Caracas" />
+                  <input type="text" required className="form-input" placeholder="Caracas" value={city} onChange={(e) => setCity(e.target.value)} />
                 </div>
 
                 <div>
                   <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Código Postal</label>
-                  <input type="text" required className="form-input" placeholder="1010" />
+                  <input type="text" required className="form-input" placeholder="1010" value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -203,7 +211,7 @@ export default function Checkout() {
                   <p style={{ margin: '0 0 15px 0', color: '#555' }}>RIF: <strong>J-12345678-9</strong></p>
                   
                   <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Número de Referencia</label>
-                  <input type="text" required className="form-input" placeholder="Ingresa los últimos 6 dígitos" />
+                  <input type="text" required className="form-input" placeholder="Ingresa los últimos 6 dígitos" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} />
                 </div>
               )}
             </div>

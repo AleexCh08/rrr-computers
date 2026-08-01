@@ -246,6 +246,19 @@ export default function AdminOrders() {
               </div>
             </div>
 
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', backgroundColor: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0', margin: '20px 0' }}>
+              <div>
+                <h4 style={{ margin: '0 0 10px 0', color: '#475569', fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Datos de Envío</h4>
+                <p style={{ margin: '0 0 5px 0', fontSize: '0.9rem', color: '#333' }}><strong>Teléfono:</strong> {selectedOrder.phone || 'No especificado'}</p>
+                <p style={{ margin: '0', fontSize: '0.9rem', color: '#333', lineHeight: '1.4' }}><strong>Dirección:</strong> {selectedOrder.shipping_address || 'No especificada'}</p>
+              </div>
+              <div>
+                <h4 style={{ margin: '0 0 10px 0', color: '#475569', fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Detalles de Pago</h4>
+                <p style={{ margin: '0 0 5px 0', fontSize: '0.9rem', color: '#333' }}><strong>Método:</strong> {selectedOrder.payment_method ? selectedOrder.payment_method.toUpperCase() : 'N/A'}</p>
+                <p style={{ margin: '0', fontSize: '0.9rem', color: '#333' }}><strong>Referencia:</strong> {selectedOrder.payment_reference || 'N/A'}</p>
+              </div>
+            </div>
+
             <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
             
             <h4 style={{ margin: '0 0 15px 0', color: 'var(--text-dark)', fontSize: '1.1rem' }}>Artículos Comprados:</h4>
