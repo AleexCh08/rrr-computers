@@ -17,7 +17,9 @@ export default function DonationForm() {
           setDonorData(prevData => ({
             ...prevData,
             name: response.data.first_name || response.data.username || '',
-            email: response.data.email || ''
+            email: response.data.email || '',
+            phone: response.data.phone && response.data.phone !== 'No registrado' ? response.data.phone : '',
+            address: response.data.address && response.data.address !== 'No registrada' ? response.data.address : ''
           }));
         } catch (error) {
           console.error("El usuario no está autenticado. Formulario público.");

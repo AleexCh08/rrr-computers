@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import Modal from '../ui/Modal';
 import api from '../../services/api';
@@ -9,6 +9,20 @@ export default function ReturnForm() {
     { id: Date.now(), type: '', condition: '', brand: '', reason: '' }
   ]);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (localStorage.getItem('access_token')) {
+        try {
+          const response = await api.get('usuarios/perfil/');
+          setClientName(response.data.first_name || response.data.username || '');
+        } catch (error) {
+          console.error("Sesión expirada o no iniciada.");
+        }
+      }
+    };
+    fetchUserData();
+  }, []);
 
   const addComponent = () => {
     setComponentsList([...componentsList, { id: Date.now(), type: '', condition: '', brand: '', reason: '' }]);
