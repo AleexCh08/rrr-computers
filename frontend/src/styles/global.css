@@ -14,6 +14,11 @@
   box-sizing: border-box;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--text-light);

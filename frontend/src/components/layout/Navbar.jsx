@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FiSearch, FiUser, FiShoppingCart } from 'react-icons/fi';
+import { FiSearch, FiUser, FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
 import './Navbar.css';
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isAuthenticated = Boolean(localStorage.getItem('access_token'));
 
@@ -65,29 +66,27 @@ export default function Navbar() {
             <h2>RRR<span>COMPUTERS</span></h2>
           </Link>
         </div>
-        <ul className="nav-links">
-          <li><Link to="/catalogo" style={getLinkStyle('/catalogo')}>Componentes</Link></li>
-          <li><Link to="/ensamblar" style={getLinkStyle('/ensamblar')}>Ensamblar</Link></li>
-          <li><Link to="/asesoria" style={getLinkStyle('/asesoria')}>Asesoría</Link></li>
-          <li><Link to="/donar" style={getLinkStyle('/donar')}>Donar</Link></li>
-          <li><Link to="/devolucion" style={getLinkStyle('/devolucion')}>Devolución</Link></li>
-          <li><Link to="/nosotros" style={getLinkStyle('/nosotros')}>Nosotros</Link></li>
+        <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+          <li><Link to="/catalogo" style={getLinkStyle('/catalogo')} onClick={() => setIsMenuOpen(false)}>Componentes</Link></li>
+          <li><Link to="/ensamblar" style={getLinkStyle('/ensamblar')} onClick={() => setIsMenuOpen(false)}>Ensamblar</Link></li>
+          <li><Link to="/asesoria" style={getLinkStyle('/asesoria')} onClick={() => setIsMenuOpen(false)}>Asesoría</Link></li>
+          <li><Link to="/donar" style={getLinkStyle('/donar')} onClick={() => setIsMenuOpen(false)}>Donar</Link></li>
+          <li><Link to="/devolucion" style={getLinkStyle('/devolucion')} onClick={() => setIsMenuOpen(false)}>Devolución</Link></li>
+          <li><Link to="/nosotros" style={getLinkStyle('/nosotros')} onClick={() => setIsMenuOpen(false)}>Nosotros</Link></li>
+          <li className="mobile-search">
+            <div className="search-bar">
+              <FiSearch color="#888" style={{ cursor: 'pointer' }} onClick={() => { executeSearch(); setIsMenuOpen(false); }} />
+              <input type="text" placeholder="Buscar" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={(e) => { handleSearch(e); if(e.key === 'Enter') setIsMenuOpen(false); }} />
+            </div>
+          </li>
         </ul>
         <div className="nav-actions">
-          <div className="search-bar">
-            <FiSearch 
-              color="#888" 
-              style={{ cursor: 'pointer' }} 
-              onClick={executeSearch}
-            />
-            <input 
-              type="text" 
-              placeholder="Buscar" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleSearch}
-            />
+          {/* ACTUALIZADO: Buscador de escritorio (se oculta en móviles en el CSS) */}
+          <div className="search-bar desktop-search">
+            <FiSearch color="#888" style={{ cursor: 'pointer' }} onClick={executeSearch} />
+            <input type="text" placeholder="Buscar" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={handleSearch} />
           </div>
+          
           <Link to={isAuthenticated ? "/mi-cuenta" : "/login"} style={{ color: 'inherit' }} title={isAuthenticated ? "Mi Cuenta" : "Iniciar Sesión"}>
             <FiUser size={24} style={{ cursor: 'pointer', color: isAuthenticated ? 'var(--accent-green)' : 'inherit' }} />
           </Link>
@@ -95,6 +94,11 @@ export default function Navbar() {
           <Link to="/carrito" style={{ color: 'inherit' }}>
             <FiShoppingCart size={24} style={{ cursor: 'pointer' }} />
           </Link>
+
+          {/* NUEVO: Botón de Hamburguesa para móviles */}
+          <button className="mobile-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <FiX size={28} /> : <FiMenu size={28} />}
+          </button>
         </div>
       </div>
     </nav>
