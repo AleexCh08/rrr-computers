@@ -1,6 +1,6 @@
 :root {
-  --primary-dark: #2A2D43; /* El azul oscuro del header y fondos */
-  --accent-green: #4CAF50; /* El verde de los botones */
+  --primary-dark: #2A2D43; 
+  --accent-green: #4CAF50; 
   --accent-green-hover: #45a049;
   --bg-light: #F8F9FA;
   --text-dark: #222222;
@@ -28,7 +28,6 @@ body {
 ul { list-style: none; }
 a { text-decoration: none; color: inherit; }
 
-/* Utilidades globales */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -168,6 +167,57 @@ a { text-decoration: none; color: inherit; }
   margin-bottom: 20px;
 }
 
+.catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.catalog-body {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 40px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-bottom: 50px;
+}
+
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.checkout-address-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.help-banner {
+  background-color: #5A7D9A;
+  padding: 50px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-top: 60px;
+}
+
+.help-banner-title {
+  color: white;
+  font-size: 2.5rem;
+  margin: 0;
+}
+
 @media (max-width: 900px) {
   .hero-content, .catalog-layout, .collab-layout {
     flex-direction: column;
@@ -202,5 +252,41 @@ a { text-decoration: none; color: inherit; }
   
   .hero-icon {
     font-size: 80px;
+  }
+
+  .catalog-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .catalog-body {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-address-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-methods {
+    flex-direction: column;
+  }
+
+  .help-banner {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .help-banner-title {
+    font-size: 1.8rem;
   }
 }

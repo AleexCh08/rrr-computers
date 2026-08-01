@@ -119,7 +119,7 @@ export default function Checkout() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '40px', alignItems: 'start' }}>
+        <form onSubmit={handleSubmit} className="checkout-layout">
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
             
@@ -128,7 +128,7 @@ export default function Checkout() {
                 <FiTruck color="#4CAF50" /> Dirección de Envío
               </h2>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="checkout-address-grid">
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label className="form-label" style={{ fontWeight: '600', color: '#333', marginBottom: '8px', display: 'block' }}>Nombre Completo</label>
                   <input 
@@ -168,7 +168,7 @@ export default function Checkout() {
                 <FiCreditCard color="#4CAF50" /> Método de Pago
               </h2>
 
-              <div style={{ display: 'flex', gap: '15px', marginBottom: '25px' }}>
+              <div className="payment-methods" style={{ display: 'flex', gap: '15px', marginBottom: '25px' }}>
                 <div 
                   onClick={() => setPaymentMethod('tarjeta')}
                   style={{ flex: 1, border: paymentMethod === 'tarjeta' ? '2px solid var(--accent-green)' : '1px solid #ddd', borderRadius: '8px', padding: '15px', cursor: 'pointer', textAlign: 'center', backgroundColor: paymentMethod === 'tarjeta' ? '#f4fbf5' : 'white', transition: 'all 0.2s' }}

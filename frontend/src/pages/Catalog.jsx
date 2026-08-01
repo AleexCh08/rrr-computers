@@ -74,7 +74,7 @@ export default function Catalog() {
       <main className="container" style={{ flexGrow: 1, paddingTop: '30px', zIndex: 1, position: 'relative' }}>
         
         <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #eaeaea', paddingBottom: '20px', marginBottom: '30px' }}>
+          <div className="catalog-header">
             <div>
               <h1 style={{ fontSize: '2.8rem', color: 'var(--text-dark)', marginBottom: '10px' }}>Catálogo</h1>
               <div style={{ fontSize: '0.85rem', color: '#666', fontWeight: '500' }}>
@@ -97,7 +97,7 @@ export default function Catalog() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '40px' }}>
+          <div className="catalog-body">
             
             <SidebarFilters 
               category={category}
@@ -112,7 +112,7 @@ export default function Catalog() {
             />
 
             <div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '50px' }}>
+              <div className="product-grid">
                 {currentItems.length === 0 ? (
                   <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#666', fontSize: '1.2rem' }}>No hay componentes disponibles en este momento.</p>
                 ) : (

@@ -2,16 +2,8 @@ import { Link } from 'react-router-dom';
 
 export default function HelpBanner() {
   return (
-    <div style={{ 
-      backgroundColor: '#5A7D9A', 
-      padding: '50px 20px', 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      gap: '40px',
-      marginTop: '60px'
-    }}>
-      <h2 style={{ color: 'white', fontSize: '2.5rem', margin: 0 }}>¿Necesitas Ayuda?</h2>
+    <div className="help-banner">
+      <h2 className="help-banner-title">¿Necesitas Ayuda?</h2>
       <Link to="/asesoria">
         <button 
           className="btn-primary" 
@@ -25,7 +17,6 @@ export default function HelpBanner() {
           Solicita ayuda personalizada
         </button>    
       </Link>
-      
     </div>
   );
 }
